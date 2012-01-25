@@ -1,0 +1,57 @@
+body {
+    padding     : 0.5em;
+    margin      : 0;
+    font-family : 'Helvetica', 'sans-serif';
+    margin      : 0 auto;
+    width       : 100%;
+    line-height : 1.5em;
+}
+
+@media (min-width: 1000px){
+    body { width: 1000px }
+}
+
+/* headers */
+h1 {  
+    font-size   : 1.5em;
+}
+h2 {
+    font-size   : 1.2em;
+}
+h3 {
+    font-size   : 1em;
+} 
+h4 {}
+h5 {}
+h6 {}
+
+/* classes and ids */
+#stats {
+    list-style      : none;
+    text-align      : center;
+    border-bottom   : 1px #ddd solid;
+    padding-bottom  : 1em;
+    margin-bottom   : 1em;
+}
+
+.suite, .test {
+    overflow: auto;
+    padding : 0.5em 2em;
+    border  : 1px #ddd solid;
+}
+
+.test {
+    border  : 1px #ddd solid;
+}
+
+.suite h1, h2, h3, h4, h5, h6 {
+    font-weight : 100;
+}
+
+.pass {
+    color: #0c0;
+}
+
+.fail {
+    color: #c00;
+}

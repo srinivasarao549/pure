@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+    <title>Tests</title>
+    
+    <!-- set up mocha -->
+    <link rel="stylesheet" href="style.css" />
+    <script src="jquery-1.7.1.min.js"></script>
+    <script src="expect.js"></script>
+    <script src="mocha.js"></script>
+    <script>mocha.setup('bdd')</script>
+    
+    <!-- lib files -->
+    <script src="../../build/puur.js"></script>
+
+    <!-- test files -->
+    
+    <!-- go go go ! -->
+    <script>
+    $(function () {
+      mocha
+        .run()
+        .globals(['CAAT', 'purr']) // acceptable globals
+    })
+
+    </script>
+</head>
+<body>
+  <div id="mocha"></div>
+</body>
+</html>
