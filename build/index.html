@@ -1,1 +1,43 @@
-<script src="pure.js"></script>
+<!doctype html>
+<html>
+<head>
+</head>
+<body>
+    <canvas id="main" width="100" height="100"></canvas>
+
+    <script src="pure.js"></script>
+    <script>
+        var pure    = require("./pure.coffee")
+          , context = document.getElementById("main").getContext("2d")
+          , world   = pure.create()
+          , BigRect = pure.factory({ width: 100, height: 100, color: 'red', alpha: 0.5, rotation: 0.5})
+          , actors = [BigRect()
+                    , BigRect({x: 34, alpha: 1,  rotation: 1})
+                    , BigRect({x: 10, color: 'black', alpha: 0.4})
+                    ]
+
+        pure.add(world, actors)
+        
+        pure.animate(world, {
+            from: { rotation: 0 }
+          , to:   { rotation: 2 * Math.PI}
+          , end  : 1000
+        })
+        
+        pure.animate(actors[1], {
+            from: { rotation: actors[1].rotation }
+          , to: { rotation: 2 * Math.PI + actors[1].rotation }
+          , end: 2000
+        })
+
+        pure.animate(actors[1], {
+            from: { x: actors[1].x }
+          , to: { x: actors[1].x + 34 }
+          , end: 1000
+        })
+
+
+        pure.run(world, context)
+    </script>
+</body>
+</html>
