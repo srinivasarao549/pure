@@ -6,4 +6,4 @@ pure = module.exports
 
 _.extend(pure, require './run.coffee')
 _.extend(pure, require './actor.coffee')
-_.extend(pure, require './animation.coffee')
+_.extend(pure, require './animate.coffee')

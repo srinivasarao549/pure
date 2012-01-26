@@ -3,6 +3,7 @@ _    = require './lib/underscore'
 
 # namespace
 pure = module.exports
+actor = pure._ = {}
 
 # Constructors
 Actor = ->
@@ -12,9 +13,10 @@ Actor = ->
     height  : 10
     width   : 10
     rotation: 0
-    alpha   : 0
-    color   : '#000'
+    alpha   : 1
+    color   : null
     shape   : 'rect'
+    update  : null
 
 Meta = ->
     offset   : Offset()
@@ -29,8 +31,9 @@ Offset = ->
     x       : 0
     y       : 0
     rotation: 0
+    alpha   : 1
 
-# World Manip
+# public API
 pure.create = ( settings ) ->
     _.extend(Actor(), settings)
 
@@ -50,3 +53,16 @@ pure.add = add = ( parent, child ) ->
 pure.kill = ( actor ) ->
     actor._meta.dead = true
     actor
+
+# private API
+actor.set_offset = ( actor ) ->
+    offset = actor._meta.offset
+    parent = actor._meta.parent
+    p_offset = parent?._meta.offset
+    
+    if not parent? 
+        return
+    else 
+        _.each( offset, (val, key) ->
+            offset[key] = parent[key] + p_offset[key]
+        )
