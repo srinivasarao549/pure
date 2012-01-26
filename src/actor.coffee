@@ -3,21 +3,21 @@ _    = require './lib/underscore'
 
 # namespace
 pure = module.exports
-actor = pure._ = {}
+private = pure._actor = {}
 
 # Constructors
 Actor = ->
-    _meta   : Meta()
-    x       : 0
+    draw    : null      # draw 
+    alpha   : 1         
+    color   : '#000'
+    x       : 0         # position
     y       : 0
     height  : 10
     width   : 10
-    rotation: 0
-    scale   : 1
-    alpha   : 1
-    color   : null
-    shape   : 'rect'
-    update  : null
+    update  : null      # events
+    click   : null
+    collide : null
+    _meta   : Meta()    # metadata
 
 Meta = ->
     offset   : Offset()
@@ -31,22 +31,24 @@ Meta = ->
 Offset = ->
     x       : 0
     y       : 0
-    rotation: 0
     alpha   : 1
-    scale   : 1
-    add     : ['rotation', 'x', 'y']
-    multiply: ['alpha', 'scale']
+    add     : ['x', 'y']
+    multiply: ['alpha']
 
 # public API
+
+# create :: {} -> Actor
 pure.create = ( settings ) ->
     _.extend(Actor(), settings)
 
+# factory :: {} -> ( {} -> Actor )
 pure.factory = ( orig_settings ) ->
     ( settings ) -> 
         actor = Actor()
         _.extend(actor, orig_settings)
         _.extend(actor, settings)
 
+# add :: Actor, Actor -> Actor
 pure.add = add = ( parent, child ) ->
     if _.isArray(child)
         return _.map(child, (child) -> add(parent, child))
@@ -54,23 +56,35 @@ pure.add = add = ( parent, child ) ->
     child._meta.parent = parent
     parent
 
+# kill :: Actor -> Actor
 pure.kill = ( actor ) ->
     actor._meta.dead = true
     actor
 
+
 # private API
-actor.set_offset = ( actor ) ->
+
+# walk_apply :: Actor, function -> Actor
+private.walk_apply = walk_apply = ( actor, func ) ->
+    func actor
+    
+    children = actor._meta.children
+    if children.length 
+        _.map( children, ( actor )-> walk_apply(actor, func))
+
+    actor
+
+# calc_offset :: Actor -> Actor
+private.calc_offset = ( actor ) ->
     offset = actor._meta.offset
     parent = actor._meta.parent
-    p_offset = parent?._meta.offset
-    
-    if not parent? 
-        return
-    else 
-        _.each(offset.add, ( key ) ->
-            offset[key] = parent[key] + p_offset[key]
+
+    if parent?
+        parent_o = parent?._meta.offset
+        _.each(offset.multiply, (key) ->
+            offset[key] = parent[key] * parent_o[key]
         )
-        
-        _.each(offset.multiply, ( key ) ->
-            offset[key] = parent[key] * p_offset[key]
+        _.each(offset.add, (key) ->
+            offset[key] = parent[key] + parent_o[key]
         )
+    actor

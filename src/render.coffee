@@ -1,42 +1,24 @@
-
 # namespace
-render = module.exports._ = {}
+render = module.exports._render = {}
 
 # private API
+
+# clear_context :: HTMLCanvasContext -> HTMLCanvasContext
 render.clear_context = ( context ) -> 
     can = context.canvas
     context.clearRect(0, 0, can.width, can.width)
+    context
 
+# actor :: Actor, HTMLCanvasContext -> Actor
 render.actor = ( actor, context ) ->
-    if actor.alpha <= 0 or not actor.color? then return    
-    offset = actor._meta.offset
-
-    context.save()
-    set_alpha(context, actor, offset)
-    set_rotate_translate(context, actor, offset)
-    set_scale(context, actor, offset)
-    
-    context.fillStyle = actor.color
-    if actor.shape
-        draw_shape(actor, context)
-    context.restore()
-
-set_alpha = ( context, actor, offset ) ->
-    alpha = actor.alpha * offset.alpha
-    if alpha < 0 then alpha = 0
-    context.globalAlpha = alpha
-
-set_rotate_translate = ( context, actor, offset ) ->
-    context.translate(offset.x, offset.y)
-    context.rotate(offset.rotation)
-    context.translate(actor.x, actor.y)
-    context.rotate(actor.rotation)
-
-set_scale = ( context, actor, offset ) ->
-    scale = actor.scale * offset.scale
-    context.scale(scale, scale)
-
-draw_shape = ( actor, context ) ->
-    if actor.shape == 'rect'
-        context.fillRect(0, 0, actor.width, actor.height)
-
+    if actor.draw? and actor.color? and actor.alpha > 0
+        offset = actor._meta.offset
+        context.globalAlpha = actor.alpha * offset.alpha
+        draw[actor.draw](actor, offset, context)
+    actor
+ 
+# helper
+draw = 
+    rect: ( actor, offset, context ) ->
+        context.fillStyle = actor.color
+        context.fillRect(actor.x + offset.x, actor.y + offset.y, actor.width, actor.height)

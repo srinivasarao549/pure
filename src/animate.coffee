@@ -1,9 +1,12 @@
+###
+
 # imports
 _    = require './lib/underscore'
 
 # namespaces
 pure = module.exports 
-animate = pure._ = {}
+pure._ = {}
+private = pure._.animation
 
 # constructor
 Animation = ->
@@ -24,12 +27,7 @@ pure.animate = ( actor, settings ) ->
 
 
 # private API
-easing = 
-    linear: ( from, by_, progress ) ->
-        from + (progress * by_ )
-
-
-animate.actor = ( actor, time_delta ) ->
+private.actor = ( actor, time_delta ) ->
     q = get_q actor
     if _.isEmpty q then return
     else step_anim(actor, time_delta, q[0])
@@ -71,3 +69,7 @@ get_q = ( actor ) ->
 
 set_q = ( actor, q ) ->
     actor._meta.anim_q = q
+
+easing = 
+    linear: ( from, by_, progress ) ->
+        from + (progress * by_ )

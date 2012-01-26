@@ -11,6 +11,7 @@
     <script>mocha.setup('bdd')</script>
     
     <!-- lib files -->
+    <script src="../../src/lib/underscore.js"></script>
     <script src="../../build/pure.js"></script>
     <script>
         var pure = require("./pure.coffee")
@@ -18,14 +19,14 @@
 
     <!-- test files -->
     <script src="../actor_spec.js"></script>
-    <script src="../run_spec.js"></script>
+    <script src="../render_spec.js"></script>
 
     <!-- go go go ! -->
     <script>
     $(function () {
       mocha
         .run()
-        .globals(['CAAT', 'purr']) // acceptable globals
+        .globals(['pure', 'underscore']) // acceptable globals
     })
 
     </script>

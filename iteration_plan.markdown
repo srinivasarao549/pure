@@ -1,3 +1,0 @@
-## Iterations:
-
-* render simple object

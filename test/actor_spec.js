@@ -1,3 +1,6 @@
+describe('actor public API', function(){
+
+
 describe('pure.create', function(){
     
     it('must apply any changes passed in as a settings object', function(){
@@ -31,7 +34,7 @@ describe('pure.factory', function(){
 })
 
 
-describe('add', function(){
+describe('pure.add', function(){
 
     it('must add the second param as a the _meta.child of the first param, and the _meta.parent of the second param to the first param', function(){
     
@@ -46,7 +49,7 @@ describe('add', function(){
 })
 
 
-describe('kill', function(){
+describe('pure.kill', function(){
 
     it('must set the _meta.dead flag on the param', function(){
         var actor = pure.create()
@@ -55,4 +58,42 @@ describe('kill', function(){
 
         expect(actor._meta.dead).to.be(true)
     })
+})
+
+})  // end public API
+
+describe('actor private API', function(){
+
+    
+describe('actor_.walk_apply', function(){
+    
+    var actor_ = pure._actor
+
+    it('must do a depth-first walk a tree of actors, and apply a function to each *before* calling the child', function(){
+        var order = []
+          , actor1 = pure.create({ num: 1 })
+          , actor2 = pure.create({ num: 2 })
+          , actor3 = pure.create({ num: 3 })
+          , actor4 = pure.create({ num: 4 })
+          , actor5 = pure.create({ num: 5 })
+          , actor6 = pure.create({ num: 6 })
+
+        pure.add(actor1, actor2)
+
+        pure.add(actor2, actor3)
+        pure.add(actor2, actor4)
+    
+        pure.add(actor4, actor5)
+    
+        pure.add(actor1, actor6)
+
+        actor_.walk_apply(actor1, function(actor){
+            order.push(actor.num)
+        })
+
+        expect(order).to.eql(order.slice().sort())
+    })
+
+})
+
 })
