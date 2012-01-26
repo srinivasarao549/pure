@@ -388,7 +388,7 @@ require.define("/run.coffee", function (require, module, exports, __dirname, __f
   };
 
   step_actor = function(actor, context, time_delta) {
-    if (actor.update != null) actor.update(actor, time_delta);
+    if (actor.update != null) actor.update(time_delta);
     actor_.set_offset(actor);
     animate.actor(actor, time_delta);
     return render.actor(actor, context);
@@ -517,7 +517,7 @@ require.define("/lib/flywheel.js", function (require, module, exports, __dirname
 
 require.define("/animate.coffee", function (require, module, exports, __dirname, __filename) {
     (function() {
-  var Animation, anim, animate, easing, get_q, next_anim, pure, set_anim, set_q, setup_from, _;
+  var Animation, animate, easing, get_q, next_anim, pure, set_anim, set_q, setup_from, step_anim, _;
 
   _ = require('./lib/underscore');
 
@@ -537,7 +537,12 @@ require.define("/animate.coffee", function (require, module, exports, __dirname,
 
   pure.animate = function(actor, settings) {
     if (_.isArray(settings)) {
-      _.map(settings, function(settings) {
+      return _.map(settings, function(settings) {
+        return pure.animate(actor, settings);
+      });
+    }
+    if (_.isArray(actor)) {
+      return _.map(actor, function(actor) {
         return pure.animate(actor, settings);
       });
     }
@@ -554,11 +559,11 @@ require.define("/animate.coffee", function (require, module, exports, __dirname,
     var q;
     q = get_q(actor);
     if (_.isEmpty(q)) {} else {
-      return anim(actor, time_delta, q[0]);
+      return step_anim(actor, time_delta, q[0]);
     }
   };
 
-  anim = function(actor, time_delta, anim) {
+  step_anim = function(actor, time_delta, anim) {
     var progress;
     anim.time += time_delta;
     progress = anim.time / anim["for"];
@@ -584,8 +589,12 @@ require.define("/animate.coffee", function (require, module, exports, __dirname,
   };
 
   next_anim = function(actor) {
-    var q;
+    var anim, q;
     q = get_q(actor);
+    anim = q[0];
+    _.each(anim.by, function(val, key) {
+      return actor[key] = anim.from[key] + val;
+    });
     return set_q(actor, _.tail(q));
   };
 
@@ -620,8 +629,10 @@ require.define("/render.coffee", function (require, module, exports, __dirname, 
     context.save();
     context.globalAlpha = actor.alpha;
     context.fillStyle = actor.color;
-    context.translate(actor.x + offset.x, actor.y + offset.y);
-    context.rotate(actor.rotation + offset.rotation);
+    context.translate(offset.x, offset.y);
+    context.rotate(offset.rotation);
+    context.translate(actor.x, actor.y);
+    context.rotate(actor.rotation);
     if (actor.shape) draw_shape(actor, context);
     return context.restore();
   };

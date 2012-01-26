@@ -19,7 +19,7 @@ step_world = ( world, context, time_delta ) ->
     walk_apply(world, func)
 
 step_actor = ( actor, context, time_delta ) ->
-    if actor.update? then actor.update(actor, time_delta)
+    if actor.update? then actor.update(time_delta)
 
     actor_.set_offset(actor)
     animate.actor(actor, time_delta)
