@@ -51,12 +51,28 @@ describe('pure.add', function(){
 
 describe('pure.kill', function(){
 
-    it('must set the _meta.dead flag on the param', function(){
+    it('must set the _meta.dead flag on the actor', function(){
         var actor = pure.create()
 
         pure.kill(actor)
 
         expect(actor._meta.dead).to.be(true)
+    })
+
+})
+
+describe('pure.activate + pure.deactivate', function(){
+
+    it('must set the _meta.active flag on the actor accordingly', function(){
+    
+        var actor = pure.create()
+
+        pure.deactivate(actor)
+        expect(actor._meta.active).to.be(false)
+
+        pure.activate(actor)
+        expect(actor._meta.active).to.be(true)
+    
     })
 })
 
@@ -92,6 +108,25 @@ describe('actor_.walk_apply', function(){
         })
 
         expect(order).to.eql(order.slice().sort())
+    })
+
+    it('must skip any branch when it encounters _.meta.active = false on an Actor', function(){
+        var hit_a_dud   = false
+          , actor1      = pure.create()
+          , actor2      = pure.create()
+          , actor3      = pure.create()
+
+        pure.add(actor1, actor2)
+        pure.add(actor2, actor3)
+
+        pure.deactivate(actor2)
+
+        actor_.walk_apply(actor1, function(actor){
+            if ( !actor._meta.active ) hit_a_dud = true
+        })
+            
+        expect(hit_a_dud).to.be(false)
+        
     })
 
 })

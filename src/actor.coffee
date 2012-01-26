@@ -24,7 +24,7 @@ Meta = ->
     parent   : null
     children : []
     anim_q   : []
-    paused   : false
+    active   : true
     dead     : false
     time     : 0
 
@@ -61,15 +61,26 @@ pure.kill = ( actor ) ->
     actor._meta.dead = true
     actor
 
+# activate :: Actor -> Actor
+pure.activate = ( actor ) ->
+    actor._meta.active = true
+    actor
+
+# deactivate :: Actor -> Actor
+pure.deactivate = ( actor ) ->
+    actor._meta.active = false
+    actor
+
 
 # private API
 
 # walk_apply :: Actor, function -> Actor
 private.walk_apply = walk_apply = ( actor, func ) ->
+    if not actor._meta.active then return actor
     func actor
     
     children = actor._meta.children
-    if children.length 
+    if children.length
         _.map( children, ( actor )-> walk_apply(actor, func))
 
     actor

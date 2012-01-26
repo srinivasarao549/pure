@@ -568,7 +568,7 @@ require.define("/actor.coffee", function (require, module, exports, __dirname, _
       parent: null,
       children: [],
       anim_q: [],
-      paused: false,
+      active: true,
       dead: false,
       time: 0
     };
@@ -613,8 +613,19 @@ require.define("/actor.coffee", function (require, module, exports, __dirname, _
     return actor;
   };
 
+  pure.activate = function(actor) {
+    actor._meta.active = true;
+    return actor;
+  };
+
+  pure.deactivate = function(actor) {
+    actor._meta.active = false;
+    return actor;
+  };
+
   private.walk_apply = walk_apply = function(actor, func) {
     var children;
+    if (!actor._meta.active) return actor;
     func(actor);
     children = actor._meta.children;
     if (children.length) {
