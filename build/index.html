@@ -9,7 +9,7 @@
     <script>
         var pure    = require("./pure.coffee")
           , context = document.getElementById("main").getContext("2d")
-          , world   = pure.create({ color: 'black'})
+          , world   = pure.create({ color: 'black', x: 100, y: 100 })
           , BigRect = pure.factory({ x: 100, y: 100, width: 100, height: 100, color: 'red', rotation: 0.5 })
 
           , actors = [BigRect({ alpha: 0.4 })
