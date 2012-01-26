@@ -13,6 +13,7 @@ Actor = ->
     height  : 10
     width   : 10
     rotation: 0
+    scale   : 1
     alpha   : 1
     color   : null
     shape   : 'rect'
@@ -32,6 +33,9 @@ Offset = ->
     y       : 0
     rotation: 0
     alpha   : 1
+    scale   : 1
+    add     : ['rotation', 'x', 'y']
+    multiply: ['alpha', 'scale']
 
 # public API
 pure.create = ( settings ) ->
@@ -63,6 +67,10 @@ actor.set_offset = ( actor ) ->
     if not parent? 
         return
     else 
-        _.each( offset, (val, key) ->
+        _.each(offset.add, ( key ) ->
             offset[key] = parent[key] + p_offset[key]
+        )
+        
+        _.each(offset.multiply, ( key ) ->
+            offset[key] = parent[key] * p_offset[key]
         )

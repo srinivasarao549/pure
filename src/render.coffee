@@ -7,21 +7,34 @@ render.clear_context = ( context ) ->
     can = context.canvas
     context.clearRect(0, 0, can.width, can.width)
 
-# todo - make rotate anchor around parent
 render.actor = ( actor, context ) ->
     if actor.alpha <= 0 or not actor.color? then return    
     offset = actor._meta.offset
 
     context.save()
-    context.globalAlpha = actor.alpha
+    set_alpha(context, actor, offset)
+    set_rotate_translate(context, actor, offset)
+    set_scale(context, actor, offset)
+    
     context.fillStyle = actor.color
+    if actor.shape
+        draw_shape(actor, context)
+    context.restore()
+
+set_alpha = ( context, actor, offset ) ->
+    alpha = actor.alpha * offset.alpha
+    if alpha < 0 then alpha = 0
+    context.globalAlpha = alpha
+
+set_rotate_translate = ( context, actor, offset ) ->
     context.translate(offset.x, offset.y)
     context.rotate(offset.rotation)
     context.translate(actor.x, actor.y)
     context.rotate(actor.rotation)
-    if actor.shape
-        draw_shape(actor, context)
-    context.restore()
+
+set_scale = ( context, actor, offset ) ->
+    scale = actor.scale * offset.scale
+    context.scale(scale, scale)
 
 draw_shape = ( actor, context ) ->
     if actor.shape == 'rect'

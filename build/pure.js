@@ -612,7 +612,7 @@ require.define("/animate.coffee", function (require, module, exports, __dirname,
 
 require.define("/render.coffee", function (require, module, exports, __dirname, __filename) {
     (function() {
-  var draw_shape, render;
+  var draw_shape, render, set_alpha, set_rotate_translate, set_scale;
 
   render = module.exports._ = {};
 
@@ -627,14 +627,32 @@ require.define("/render.coffee", function (require, module, exports, __dirname, 
     if (actor.alpha <= 0 || !(actor.color != null)) return;
     offset = actor._meta.offset;
     context.save();
-    context.globalAlpha = actor.alpha;
+    set_alpha(context, actor, offset);
+    set_rotate_translate(context, actor, offset);
+    set_scale(context, actor, offset);
     context.fillStyle = actor.color;
+    if (actor.shape) draw_shape(actor, context);
+    return context.restore();
+  };
+
+  set_alpha = function(context, actor, offset) {
+    var alpha;
+    alpha = actor.alpha * offset.alpha;
+    if (alpha < 0) alpha = 0;
+    return context.globalAlpha = alpha;
+  };
+
+  set_rotate_translate = function(context, actor, offset) {
     context.translate(offset.x, offset.y);
     context.rotate(offset.rotation);
     context.translate(actor.x, actor.y);
-    context.rotate(actor.rotation);
-    if (actor.shape) draw_shape(actor, context);
-    return context.restore();
+    return context.rotate(actor.rotation);
+  };
+
+  set_scale = function(context, actor, offset) {
+    var scale;
+    scale = actor.scale * offset.scale;
+    return context.scale(scale, scale);
   };
 
   draw_shape = function(actor, context) {
@@ -665,6 +683,7 @@ require.define("/actor.coffee", function (require, module, exports, __dirname, _
       height: 10,
       width: 10,
       rotation: 0,
+      scale: 1,
       alpha: 1,
       color: null,
       shape: 'rect',
@@ -689,7 +708,10 @@ require.define("/actor.coffee", function (require, module, exports, __dirname, _
       x: 0,
       y: 0,
       rotation: 0,
-      alpha: 1
+      alpha: 1,
+      scale: 1,
+      add: ['rotation', 'x', 'y'],
+      multiply: ['alpha', 'scale']
     };
   };
 
@@ -727,8 +749,11 @@ require.define("/actor.coffee", function (require, module, exports, __dirname, _
     parent = actor._meta.parent;
     p_offset = parent != null ? parent._meta.offset : void 0;
     if (!(parent != null)) {} else {
-      return _.each(offset, function(val, key) {
+      _.each(offset.add, function(key) {
         return offset[key] = parent[key] + p_offset[key];
+      });
+      return _.each(offset.multiply, function(key) {
+        return offset[key] = parent[key] * p_offset[key];
       });
     }
   };
@@ -750,6 +775,8 @@ require.define("/pure.coffee", function (require, module, exports, __dirname, __
   _.extend(pure, require('./actor.coffee'));
 
   _.extend(pure, require('./animate.coffee'));
+
+  delete pure._;
 
 }).call(this);
 
