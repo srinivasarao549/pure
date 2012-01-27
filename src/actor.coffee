@@ -85,6 +85,7 @@ private.walk_apply = walk_apply = ( actor, func ) ->
 
     actor
 
+
 # calc_offset :: Actor -> Actor
 private.calc_offset = ( actor ) ->
     offset = actor._meta.offset

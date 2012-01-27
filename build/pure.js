@@ -1,1 +1,724 @@
-var require=function(a,b){var c=require.resolve(a,b||"/"),d=require.modules[c];if(!d)throw new Error("Failed to resolve module "+a+", tried "+c);var e=d._cached?d._cached:d();return e};require.paths=[],require.modules={},require.extensions=[".js",".coffee"],require._core={assert:!0,events:!0,fs:!0,path:!0,vm:!0},require.resolve=function(){return function(a,b){function g(a){if(require.modules[a])return a;for(var b=0;b<require.extensions.length;b++){var c=require.extensions[b];if(require.modules[a+c])return a+c}}function h(a){a=a.replace(/\/+$/,"");var b=a+"/package.json";if(require.modules[b]){var d=require.modules[b](),e=d.browserify;if(typeof e=="object"&&e.main){var f=g(c.resolve(a,e.main));if(f)return f}else if(typeof e=="string"){var f=g(c.resolve(a,e));if(f)return f}else if(d.main){var f=g(c.resolve(a,d.main));if(f)return f}}return g(a+"/index")}function i(a,b){var c=j(b);for(var d=0;d<c.length;d++){var e=c[d],f=g(e+"/"+a);if(f)return f;var i=h(e+"/"+a);if(i)return i}var f=g(a);if(f)return f}function j(a){var b;a==="/"?b=[""]:b=c.normalize(a).split("/");var d=[];for(var e=b.length-1;e>=0;e--){if(b[e]==="node_modules")continue;var f=b.slice(0,e+1).join("/")+"/node_modules";d.push(f)}return d}b||(b="/");if(require._core[a])return a;var c=require.modules.path(),d=b||".";if(a.match(/^(?:\.\.?\/|\/)/)){var e=g(c.resolve(d,a))||h(c.resolve(d,a));if(e)return e}var f=i(a,d);if(f)return f;throw new Error("Cannot find module '"+a+"'")}}(),require.alias=function(a,b){var c=require.modules.path(),d=null;try{d=require.resolve(a+"/package.json","/")}catch(e){d=require.resolve(a,"/")}var f=c.dirname(d),g=Object_keys(require.modules);for(var h=0;h<g.length;h++){var i=g[h];if(i.slice(0,f.length+1)===f+"/"){var j=i.slice(f.length);require.modules[b+j]=require.modules[f+j]}else i===f&&(require.modules[b]=require.modules[f])}},require.define=function(a,b){var c=require._core[a]?"":require.modules.path().dirname(a),d=function(a){return require(a,c)};d.resolve=function(a){return require.resolve(a,c)},d.modules=require.modules,d.define=require.define;var e={exports:{}};require.modules[a]=function(){return require.modules[a]._cached=e.exports,b.call(e.exports,d,e,e.exports,c,a),require.modules[a]._cached=e.exports,e.exports}};var Object_keys=Object.keys||function(a){var b=[];for(var c in a)b.push(c);return b};typeof process=="undefined"&&(process={}),process.nextTick||(process.nextTick=function(a){setTimeout(a,0)}),process.title||(process.title="browser"),process.binding||(process.binding=function(a){if(a==="evals")return require("vm");throw new Error("No such module")}),process.cwd||(process.cwd=function(){return"."}),require.define("path",function(a,b,c,d,e){function f(a,b){var c=[];for(var d=0;d<a.length;d++)b(a[d],d,a)&&c.push(a[d]);return c}function g(a,b){var c=0;for(var d=a.length;d>=0;d--){var e=a[d];e=="."?a.splice(d,1):e===".."?(a.splice(d,1),c++):c&&(a.splice(d,1),c--)}if(b)for(;c--;c)a.unshift("..");return a}var h=/^(.+\/(?!$)|\/)?((?:.+?)?(\.[^.]*)?)$/;c.resolve=function(){var a="",b=!1;for(var c=arguments.length;c>=-1&&!b;c--){var d=c>=0?arguments[c]:process.cwd();if(typeof d!="string"||!d)continue;a=d+"/"+a,b=d.charAt(0)==="/"}return a=g(f(a.split("/"),function(a){return!!a}),!b).join("/"),(b?"/":"")+a||"."},c.normalize=function(a){var b=a.charAt(0)==="/",c=a.slice(-1)==="/";return a=g(f(a.split("/"),function(a){return!!a}),!b).join("/"),!a&&!b&&(a="."),a&&c&&(a+="/"),(b?"/":"")+a},c.join=function(){var a=Array.prototype.slice.call(arguments,0);return c.normalize(f(a,function(a,b){return a&&typeof a=="string"}).join("/"))},c.dirname=function(a){var b=h.exec(a)[1]||"",c=!1;return b?b.length===1||c&&b.length<=3&&b.charAt(1)===":"?b:b.substring(0,b.length-1):"."},c.basename=function(a,b){var c=h.exec(a)[2]||"";return b&&c.substr(-1*b.length)===b&&(c=c.substr(0,c.length-b.length)),c},c.extname=function(a){return h.exec(a)[3]||""}}),require.define("/lib/underscore.js",function(a,b,c,d,e){((function(){function a(b,c,d){if(b===c)return b!==0||1/b==1/c;if(b==null||c==null)return b===c;b._chain&&(b=b._wrapped),c._chain&&(c=c._wrapped);if(b.isEqual&&x.isFunction(b.isEqual))return b.isEqual(c);if(c.isEqual&&x.isFunction(c.isEqual))return c.isEqual(b);var e=k.call(b);if(e!=k.call(c))return!1;switch(e){case"[object String]":return b==String(c);case"[object Number]":return b!=+b?c!=+c:b==0?1/b==1/c:b==+c;case"[object Date]":case"[object Boolean]":return+b==+c;case"[object RegExp]":return b.source==c.source&&b.global==c.global&&b.multiline==c.multiline&&b.ignoreCase==c.ignoreCase}if(typeof b!="object"||typeof c!="object")return!1;for(var f=d.length;f--;)if(d[f]==b)return!0;d.push(b);var f=0,g=!0;if(e=="[object Array]"){if(f=b.length,g=f==c.length)for(;f--;)if(!(g=f in b==f in c&&a(b[f],c[f],d)))break}else{if("constructor"in b!="constructor"in c||b.constructor!=c.constructor)return!1;for(var h in b)if(l.call(b,h)&&(f++,!(g=l.call(c,h)&&a(b[h],c[h],d))))break;if(g){for(h in c)if(l.call(c,h)&&!(f--))break;g=!f}}return d.pop(),g}var d=this,e=d._,f={},g=Array.prototype,h=Object.prototype,i=g.slice,j=g.unshift,k=h.toString,l=h.hasOwnProperty,m=g.forEach,n=g.map,o=g.reduce,p=g.reduceRight,q=g.filter,r=g.every,s=g.some,t=g.indexOf,u=g.lastIndexOf,h=Array.isArray,v=Object.keys,w=Function.prototype.bind,x=function(a){return new D(a)};typeof c!="undefined"?(typeof b!="undefined"&&b.exports&&(c=b.exports=x),c._=x):typeof define=="function"&&define.amd?define("underscore",function(){return x}):d._=x,x.VERSION="1.2.4";var y=x.each=x.forEach=function(a,b,c){if(a!=null)if(m&&a.forEach===m)a.forEach(b,c);else if(a.length===+a.length){for(var d=0,e=a.length;d<e;d++)if(d in a&&b.call(c,a[d],d,a)===f)break}else for(d in a)if(l.call(a,d)&&b.call(c,a[d],d,a)===f)break};x.map=function(a,b,c){var d=[];return a==null?d:n&&a.map===n?a.map(b,c):(y(a,function(a,e,f){d[d.length]=b.call(c,a,e,f)}),a.length===+a.length&&(d.length=a.length),d)},x.reduce=x.foldl=x.inject=function(a,b,c,d){var e=arguments.length>2;a==null&&(a=[]);if(o&&a.reduce===o)return d&&(b=x.bind(b,d)),e?a.reduce(b,c):a.reduce(b);y(a,function(a,f,g){e?c=b.call(d,c,a,f,g):(c=a,e=!0)});if(!e)throw new TypeError("Reduce of empty array with no initial value");return c},x.reduceRight=x.foldr=function(a,b,c,d){var e=arguments.length>2;a==null&&(a=[]);if(p&&a.reduceRight===p)return d&&(b=x.bind(b,d)),e?a.reduceRight(b,c):a.reduceRight(b);var f=x.toArray(a).reverse();return d&&!e&&(b=x.bind(b,d)),e?x.reduce(f,b,c,d):x.reduce(f,b)},x.find=x.detect=function(a,b,c){var d;return z(a,function(a,e,f){if(b.call(c,a,e,f))return d=a,!0}),d},x.filter=x.select=function(a,b,c){var d=[];return a==null?d:q&&a.filter===q?a.filter(b,c):(y(a,function(a,e,f){b.call(c,a,e,f)&&(d[d.length]=a)}),d)},x.reject=function(a,b,c){var d=[];return a==null?d:(y(a,function(a,e,f){b.call(c,a,e,f)||(d[d.length]=a)}),d)},x.every=x.all=function(a,b,c){var d=!0;return a==null?d:r&&a.every===r?a.every(b,c):(y(a,function(a,e,g){if(!(d=d&&b.call(c,a,e,g)))return f}),d)};var z=x.some=x.any=function(a,b,c){b||(b=x.identity);var d=!1;return a==null?d:s&&a.some===s?a.some(b,c):(y(a,function(a,e,g){if(d||(d=b.call(c,a,e,g)))return f}),!!d)};x.include=x.contains=function(a,b){var c=!1;return a==null?c:t&&a.indexOf===t?a.indexOf(b)!=-1:c=z(a,function(a){return a===b})},x.invoke=function(a,b){var c=i.call(arguments,2);return x.map(a,function(a){return(x.isFunction(b)?b||a:a[b]).apply(a,c)})},x.pluck=function(a,b){return x.map(a,function(a){return a[b]})},x.max=function(a,b,c){if(!b&&x.isArray(a))return Math.max.apply(Math,a);if(!b&&x.isEmpty(a))return-Infinity;var d={computed:-Infinity};return y(a,function(a,e,f){e=b?b.call(c,a,e,f):a,e>=d.computed&&(d={value:a,computed:e})}),d.value},x.min=function(a,b,c){if(!b&&x.isArray(a))return Math.min.apply(Math,a);if(!b&&x.isEmpty(a))return Infinity;var d={computed:Infinity};return y(a,function(a,e,f){e=b?b.call(c,a,e,f):a,e<d.computed&&(d={value:a,computed:e})}),d.value},x.shuffle=function(a){var b=[],c;return y(a,function(a,d){d==0?b[0]=a:(c=Math.floor(Math.random()*(d+1)),b[d]=b[c],b[c]=a)}),b},x.sortBy=function(a,b,c){return x.pluck(x.map(a,function(a,d,e){return{value:a,criteria:b.call(c,a,d,e)}}).sort(function(a,b){var c=a.criteria,d=b.criteria;return c<d?-1:c>d?1:0}),"value")},x.groupBy=function(a,b){var c={},d=x.isFunction(b)?b:function(a){return a[b]};return y(a,function(a,b){var e=d(a,b);(c[e]||(c[e]=[])).push(a)}),c},x.sortedIndex=function(a,b,c){c||(c=x.identity);for(var d=0,e=a.length;d<e;){var f=d+e>>1;c(a[f])<c(b)?d=f+1:e=f}return d},x.toArray=function(a){return a?a.toArray?a.toArray():x.isArray(a)?i.call(a):x.isArguments(a)?i.call(a):x.values(a):[]},x.size=function(a){return x.toArray(a).length},x.first=x.head=function(a,b,c){return b!=null&&!c?i.call(a,0,b):a[0]},x.initial=function(a,b,c){return i.call(a,0,a.length-(b==null||c?1:b))},x.last=function(a,b,c){return b!=null&&!c?i.call(a,Math.max(a.length-b,0)):a[a.length-1]},x.rest=x.tail=function(a,b,c){return i.call(a,b==null||c?1:b)},x.compact=function(a){return x.filter(a,function(a){return!!a})},x.flatten=function(a,b){return x.reduce(a,function(a,c){return x.isArray(c)?a.concat(b?c:x.flatten(c)):(a[a.length]=c,a)},[])},x.without=function(a){return x.difference(a,i.call(arguments,1))},x.uniq=x.unique=function(a,b,c){var c=c?x.map(a,c):a,d=[];return x.reduce(c,function(c,e,f){if(0==f||(b===!0?x.last(c)!=e:!x.include(c,e)))c[c.length]=e,d[d.length]=a[f];return c},[]),d},x.union=function(){return x.uniq(x.flatten(arguments,!0))},x.intersection=x.intersect=function(a){var b=i.call(arguments,1);return x.filter(x.uniq(a),function(a){return x.every(b,function(b){return x.indexOf(b,a)>=0})})},x.difference=function(a){var b=x.flatten(i.call(arguments,1));return x.filter(a,function(a){return!x.include(b,a)})},x.zip=function(){for(var a=i.call(arguments),b=x.max(x.pluck(a,"length")),c=Array(b),d=0;d<b;d++)c[d]=x.pluck(a,""+d);return c},x.indexOf=function(a,b,c){if(a==null)return-1;var d;if(c)return c=x.sortedIndex(a,b),a[c]===b?c:-1;if(t&&a.indexOf===t)return a.indexOf(b);for(c=0,d=a.length;c<d;c++)if(c in a&&a[c]===b)return c;return-1},x.lastIndexOf=function(a,b){if(a==null)return-1;if(u&&a.lastIndexOf===u)return a.lastIndexOf(b);for(var c=a.length;c--;)if(c in a&&a[c]===b)return c;return-1},x.range=function(a,b,c){arguments.length<=1&&(b=a||0,a=0);for(var c=arguments[2]||1,d=Math.max(Math.ceil((b-a)/c),0),e=0,f=Array(d);e<d;)f[e++]=a,a+=c;return f};var A=function(){};x.bind=function(a,b){var c,d;if(a.bind===w&&w)return w.apply(a,i.call(arguments,1));if(!x.isFunction(a))throw new TypeError;return d=i.call(arguments,2),c=function(){if(this instanceof c){A.prototype=a.prototype;var e=new A,f=a.apply(e,d.concat(i.call(arguments)));return Object(f)===f?f:e}return a.apply(b,d.concat(i.call(arguments)))}},x.bindAll=function(a){var b=i.call(arguments,1);return b.length==0&&(b=x.functions(a)),y(b,function(b){a[b]=x.bind(a[b],a)}),a},x.memoize=function(a,b){var c={};return b||(b=x.identity),function(){var d=b.apply(this,arguments);return l.call(c,d)?c[d]:c[d]=a.apply(this,arguments)}},x.delay=function(a,b){var c=i.call(arguments,2);return setTimeout(function(){return a.apply(a,c)},b)},x.defer=function(a){return x.delay.apply(x,[a,1].concat(i.call(arguments,1)))},x.throttle=function(a,b){var c,d,e,f,g,h=x.debounce(function(){g=f=!1},b);return function(){c=this,d=arguments;var i;e||(e=setTimeout(function(){e=null,g&&a.apply(c,d),h()},b)),f?g=!0:a.apply(c,d),h(),f=!0}},x.debounce=function(a,b){var c;return function(){var d=this,e=arguments;clearTimeout(c),c=setTimeout(function(){c=null,a.apply(d,e)},b)}},x.once=function(a){var b=!1,c;return function(){return b?c:(b=!0,c=a.apply(this,arguments))}},x.wrap=function(a,b){return function(){var c=[a].concat(i.call(arguments,0));return b.apply(this,c)}},x.compose=function(){var a=arguments;return function(){for(var b=arguments,c=a.length-1;c>=0;c--)b=[a[c].apply(this,b)];return b[0]}},x.after=function(a,b){return a<=0?b():function(){if(--a<1)return b.apply(this,arguments)}},x.keys=v||function(a){if(a!==Object(a))throw new TypeError("Invalid object");var b=[],c;for(c in a)l.call(a,c)&&(b[b.length]=c);return b},x.values=function(a){return x.map(a,x.identity)},x.functions=x.methods=function(a){var b=[],c;for(c in a)x.isFunction(a[c])&&b.push(c);return b.sort()},x.extend=function(a){return y(i.call(arguments,1),function(b){for(var c in b)b[c]!==void 0&&(a[c]=b[c])}),a},x.defaults=function(a){return y(i.call(arguments,1),function(b){for(var c in b)a[c]==null&&(a[c]=b[c])}),a},x.clone=function(a){return x.isObject(a)?x.isArray(a)?a.slice():x.extend({},a):a},x.tap=function(a,b){return b(a),a},x.isEqual=function(b,c){return a(b,c,[])},x.isEmpty=function(a){if(x.isArray(a)||x.isString(a))return a.length===0;for(var b in a)if(l.call(a,b))return!1;return!0},x.isElement=function(a){return!!a&&a.nodeType==1},x.isArray=h||function(a){return k.call(a)=="[object Array]"},x.isObject=function(a){return a===Object(a)},x.isArguments=function(a){return k.call(a)=="[object Arguments]"},x.isArguments(arguments)||(x.isArguments=function(a){return!!a&&!!l.call(a,"callee")}),x.isFunction=function(a){return k.call(a)=="[object Function]"},x.isString=function(a){return k.call(a)=="[object String]"},x.isNumber=function(a){return k.call(a)=="[object Number]"},x.isNaN=function(a){return a!==a},x.isBoolean=function(a){return a===!0||a===!1||k.call(a)=="[object Boolean]"},x.isDate=function(a){return k.call(a)=="[object Date]"},x.isRegExp=function(a){return k.call(a)=="[object RegExp]"},x.isNull=function(a){return a===null},x.isUndefined=function(a){return a===void 0},x.noConflict=function(){return d._=e,this},x.identity=function(a){return a},x.times=function(a,b,c){for(var d=0;d<a;d++)b.call(c,d)},x.escape=function(a){return(""+a).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;").replace(/\//g,"&#x2F;")},x.mixin=function(a){y(x.functions(a),function(b){F(b,x[b]=a[b])})};var B=0;x.uniqueId=function(a){var b=B++;return a?a+b:b},x.templateSettings={evaluate:/<%([\s\S]+?)%>/g,interpolate:/<%=([\s\S]+?)%>/g,escape:/<%-([\s\S]+?)%>/g};var C=/.^/;x.template=function(a,b){var c=x.templateSettings,c="var __p=[],print=function(){__p.push.apply(__p,arguments);};with(obj||{}){__p.push('"+a.replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(c.escape||C,function(a,b){return"',_.escape("+b.replace(/\\'/g,"'")+"),'"}).replace(c.interpolate||C,function(a,b){return"',"+b.replace(/\\'/g,"'")+",'"}).replace(c.evaluate||C,function(a,b){return"');"+b.replace(/\\'/g,"'").replace(/[\r\n\t]/g," ").replace(/\\\\/g,"\\")+";__p.push('"}).replace(/\r/g,"\\r").replace(/\n/g,"\\n").replace(/\t/g,"\\t")+"');}return __p.join('');",d=new Function("obj","_",c);return b?d(b,x):function(a){return d.call(this,a,x)}},x.chain=function(a){return x(a).chain()};var D=function(a){this._wrapped=a};x.prototype=D.prototype;var E=function(a,b){return b?x(a).chain():a},F=function(a,b){D.prototype[a]=function(){var a=i.call(arguments);return j.call(a,this._wrapped),E(b.apply(x,a),this._chain)}};x.mixin(x),y("pop,push,reverse,shift,sort,splice,unshift".split(","),function(a){var b=g[a];D.prototype[a]=function(){var c=this._wrapped;b.apply(c,arguments);var d=c.length;return(a=="shift"||a=="splice")&&d===0&&delete c[0],E(c,this._chain)}}),y(["concat","join","slice"],function(a){var b=g[a];D.prototype[a]=function(){return E(b.apply(this._wrapped,arguments),this._chain)}}),D.prototype.chain=function(){return this._chain=!0,this},D.prototype.value=function(){return this._wrapped}})).call(this)}),require.define("/render.coffee",function(a,b,c,d,e){((function(){var a,c;c=b.exports._render={},c.clear_context=function(a){var b;return b=a.canvas,a.clearRect(0,0,b.width,b.width),a},c.actor=function(b,c){var d;return b.draw!=null&&b.color!=null&&b.alpha>0&&(d=b._meta.offset,c.globalAlpha=b.alpha*d.alpha,a[b.draw](b,d,c)),b},a={rect:function(a,b,c){return c.fillStyle=a.color,c.fillRect(a.x+b.x,a.y+b.y,a.width,a.height)}}})).call(this)}),require.define("/event.coffee",function(a,b,c,d,e){}),require.define("/run.coffee",function(a,b,c,d,e){((function(){var c,d,e,f,g,h,i;d=a("./lib/flywheel"),i=a("./lib/underscore"),f=a("./render.coffee")._render,c=a("./actor.coffee")._actor,e=b.exports,e.run=function(a,b){var c;return c=function(c){return h(a,b,c)},d(c).start()},h=function(a,b,d){var e;return f.clear_context(b),e=function(a){return g(a,b,d)},c.walk_apply(a,e),a},g=function(a,b,d){return c.calc_offset(a),f.actor(a,b),a}})).call(this)}),require.define("/lib/flywheel.js",function(a,b,c,d,e){void function(a){function e(a,b){var c=Object.create(d);return c.callback=a,c.element=b,c}var c=function(){return window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||window.oRequestAnimationFrame||window.msRequestAnimationFrame||function(a){setTimeout(function(){a(+(new Date))},1e3/60)}}(),d={callback:undefined,element:undefined,framerate_cap:33,default_framerate:16,_last_timestamp:undefined,_running:!1,start:function(){return this._running=!0,this._next_frame(undefined,this.default_framerate),this},stop:function(){return this._running=!1,this},toggle:function(){return this._running?this.stop():this.start(),this},step:function(a){return this._next_frame(undefined,a||this.default_framerate),this},_next_frame:function(a,b){this._running&&c(this._next_frame.bind(this),this.element),typeof b=="undefined"&&(b=a-this._last_timestamp,b>this.framerate_cap&&(b=this.framerate_cap),this._last_timestamp=a),b&&this.callback(b)}};typeof b!="undefined"&&b.exports?b.exports=e:a.flywheel=e}(this)}),require.define("/actor.coffee",function(a,b,c,d,e){((function(){var c,d,e,f,g,h,i,j;j=a("./lib/underscore"),h=b.exports,g=h._actor={},c=function(){return{draw:null,alpha:1,color:"#000",x:0,y:0,height:10,width:10,update:null,click:null,collide:null,_meta:d()}},d=function(){return{offset:e(),parent:null,children:[],anim_q:[],active:!0,dead:!1,time:0}},e=function(){return{x:0,y:0,alpha:1,add:["x","y"],multiply:["alpha"]}},h.create=function(a){return j.extend(c(),a)},h.factory=function(a){return function(b){var d;return d=c(),j.extend(d,a),j.extend(d,b)}},h.add=f=function(a,b){return j.isArray(b)?j.map(b,function(b){return f(a,b)}):(a._meta.children.push(b),b._meta.parent=a,a)},h.kill=function(a){return a._meta.dead=!0,a},h.activate=function(a){return a._meta.active=!0,a},h.deactivate=function(a){return a._meta.active=!1,a},g.walk_apply=i=function(a,b){var c;return a._meta.active?(b(a),c=a._meta.children,c.length&&j.map(c,function(a){return i(a,b)}),a):a},g.calc_offset=function(a){var b,c,d;return b=a._meta.offset,c=a._meta.parent,c!=null&&(d=c!=null?c._meta.offset:void 0,j.each(b.multiply,function(a){return b[a]=c[a]*d[a]}),j.each(b.add,function(a){return b[a]=c[a]+d[a]})),a}})).call(this)}),require.define("/animate.coffee",function(a,b,c,d,e){((function(){var c,d,e,f,g;g=a("./lib/underscore"),f=b.exports,e=f._animation,c=function(){return{"for":0,by:null,easing:"linear",time:0}},f.animate=d=function(a,b){return g.isArray(b)?g.map(b,function(b){return d(a,b)}):g.isArray(a)?g.map(a,function(a){return d(a,b)}):(a._meta.anim_q.push(g.extend(c(),b)),a)}})).call(this)}),require.define("/pure.coffee",function(a,b,c,d,e){((function(){var c,d;d=a("./lib/underscore"),c=b.exports,d.extend(c,a("./render.coffee")),d.extend(c,a("./event.coffee")),d.extend(c,a("./run.coffee")),d.extend(c,a("./actor.coffee")),d.extend(c,a("./animate.coffee"))})).call(this)}),require("/pure.coffee");
+var require = function (file, cwd) {
+    var resolved = require.resolve(file, cwd || '/');
+    var mod = require.modules[resolved];
+    if (!mod) throw new Error(
+        'Failed to resolve module ' + file + ', tried ' + resolved
+    );
+    var res = mod._cached ? mod._cached : mod();
+    return res;
+}
+
+require.paths = [];
+require.modules = {};
+require.extensions = [".js",".coffee"];
+
+require._core = {
+    'assert': true,
+    'events': true,
+    'fs': true,
+    'path': true,
+    'vm': true
+};
+
+require.resolve = (function () {
+    return function (x, cwd) {
+        if (!cwd) cwd = '/';
+        
+        if (require._core[x]) return x;
+        var path = require.modules.path();
+        var y = cwd || '.';
+        
+        if (x.match(/^(?:\.\.?\/|\/)/)) {
+            var m = loadAsFileSync(path.resolve(y, x))
+                || loadAsDirectorySync(path.resolve(y, x));
+            if (m) return m;
+        }
+        
+        var n = loadNodeModulesSync(x, y);
+        if (n) return n;
+        
+        throw new Error("Cannot find module '" + x + "'");
+        
+        function loadAsFileSync (x) {
+            if (require.modules[x]) {
+                return x;
+            }
+            
+            for (var i = 0; i < require.extensions.length; i++) {
+                var ext = require.extensions[i];
+                if (require.modules[x + ext]) return x + ext;
+            }
+        }
+        
+        function loadAsDirectorySync (x) {
+            x = x.replace(/\/+$/, '');
+            var pkgfile = x + '/package.json';
+            if (require.modules[pkgfile]) {
+                var pkg = require.modules[pkgfile]();
+                var b = pkg.browserify;
+                if (typeof b === 'object' && b.main) {
+                    var m = loadAsFileSync(path.resolve(x, b.main));
+                    if (m) return m;
+                }
+                else if (typeof b === 'string') {
+                    var m = loadAsFileSync(path.resolve(x, b));
+                    if (m) return m;
+                }
+                else if (pkg.main) {
+                    var m = loadAsFileSync(path.resolve(x, pkg.main));
+                    if (m) return m;
+                }
+            }
+            
+            return loadAsFileSync(x + '/index');
+        }
+        
+        function loadNodeModulesSync (x, start) {
+            var dirs = nodeModulesPathsSync(start);
+            for (var i = 0; i < dirs.length; i++) {
+                var dir = dirs[i];
+                var m = loadAsFileSync(dir + '/' + x);
+                if (m) return m;
+                var n = loadAsDirectorySync(dir + '/' + x);
+                if (n) return n;
+            }
+            
+            var m = loadAsFileSync(x);
+            if (m) return m;
+        }
+        
+        function nodeModulesPathsSync (start) {
+            var parts;
+            if (start === '/') parts = [ '' ];
+            else parts = path.normalize(start).split('/');
+            
+            var dirs = [];
+            for (var i = parts.length - 1; i >= 0; i--) {
+                if (parts[i] === 'node_modules') continue;
+                var dir = parts.slice(0, i + 1).join('/') + '/node_modules';
+                dirs.push(dir);
+            }
+            
+            return dirs;
+        }
+    };
+})();
+
+require.alias = function (from, to) {
+    var path = require.modules.path();
+    var res = null;
+    try {
+        res = require.resolve(from + '/package.json', '/');
+    }
+    catch (err) {
+        res = require.resolve(from, '/');
+    }
+    var basedir = path.dirname(res);
+    
+    var keys = Object_keys(require.modules);
+    
+    for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        if (key.slice(0, basedir.length + 1) === basedir + '/') {
+            var f = key.slice(basedir.length);
+            require.modules[to + f] = require.modules[basedir + f];
+        }
+        else if (key === basedir) {
+            require.modules[to] = require.modules[basedir];
+        }
+    }
+};
+
+require.define = function (filename, fn) {
+    var dirname = require._core[filename]
+        ? ''
+        : require.modules.path().dirname(filename)
+    ;
+    
+    var require_ = function (file) {
+        return require(file, dirname)
+    };
+    require_.resolve = function (name) {
+        return require.resolve(name, dirname);
+    };
+    require_.modules = require.modules;
+    require_.define = require.define;
+    var module_ = { exports : {} };
+    
+    require.modules[filename] = function () {
+        require.modules[filename]._cached = module_.exports;
+        fn.call(
+            module_.exports,
+            require_,
+            module_,
+            module_.exports,
+            dirname,
+            filename
+        );
+        require.modules[filename]._cached = module_.exports;
+        return module_.exports;
+    };
+};
+
+var Object_keys = Object.keys || function (obj) {
+    var res = [];
+    for (var key in obj) res.push(key)
+    return res;
+};
+
+if (typeof process === 'undefined') process = {};
+
+if (!process.nextTick) process.nextTick = function (fn) {
+    setTimeout(fn, 0);
+};
+
+if (!process.title) process.title = 'browser';
+
+if (!process.binding) process.binding = function (name) {
+    if (name === 'evals') return require('vm')
+    else throw new Error('No such module')
+};
+
+if (!process.cwd) process.cwd = function () { return '.' };
+
+require.define("path", function (require, module, exports, __dirname, __filename) {
+    function filter (xs, fn) {
+    var res = [];
+    for (var i = 0; i < xs.length; i++) {
+        if (fn(xs[i], i, xs)) res.push(xs[i]);
+    }
+    return res;
+}
+
+// resolves . and .. elements in a path array with directory names there
+// must be no slashes, empty elements, or device names (c:\) in the array
+// (so also no leading and trailing slashes - it does not distinguish
+// relative and absolute paths)
+function normalizeArray(parts, allowAboveRoot) {
+  // if the path tries to go above the root, `up` ends up > 0
+  var up = 0;
+  for (var i = parts.length; i >= 0; i--) {
+    var last = parts[i];
+    if (last == '.') {
+      parts.splice(i, 1);
+    } else if (last === '..') {
+      parts.splice(i, 1);
+      up++;
+    } else if (up) {
+      parts.splice(i, 1);
+      up--;
+    }
+  }
+
+  // if the path is allowed to go above the root, restore leading ..s
+  if (allowAboveRoot) {
+    for (; up--; up) {
+      parts.unshift('..');
+    }
+  }
+
+  return parts;
+}
+
+// Regex to split a filename into [*, dir, basename, ext]
+// posix version
+var splitPathRe = /^(.+\/(?!$)|\/)?((?:.+?)?(\.[^.]*)?)$/;
+
+// path.resolve([from ...], to)
+// posix version
+exports.resolve = function() {
+var resolvedPath = '',
+    resolvedAbsolute = false;
+
+for (var i = arguments.length; i >= -1 && !resolvedAbsolute; i--) {
+  var path = (i >= 0)
+      ? arguments[i]
+      : process.cwd();
+
+  // Skip empty and invalid entries
+  if (typeof path !== 'string' || !path) {
+    continue;
+  }
+
+  resolvedPath = path + '/' + resolvedPath;
+  resolvedAbsolute = path.charAt(0) === '/';
+}
+
+// At this point the path should be resolved to a full absolute path, but
+// handle relative paths to be safe (might happen when process.cwd() fails)
+
+// Normalize the path
+resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
+    return !!p;
+  }), !resolvedAbsolute).join('/');
+
+  return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
+};
+
+// path.normalize(path)
+// posix version
+exports.normalize = function(path) {
+var isAbsolute = path.charAt(0) === '/',
+    trailingSlash = path.slice(-1) === '/';
+
+// Normalize the path
+path = normalizeArray(filter(path.split('/'), function(p) {
+    return !!p;
+  }), !isAbsolute).join('/');
+
+  if (!path && !isAbsolute) {
+    path = '.';
+  }
+  if (path && trailingSlash) {
+    path += '/';
+  }
+  
+  return (isAbsolute ? '/' : '') + path;
+};
+
+
+// posix version
+exports.join = function() {
+  var paths = Array.prototype.slice.call(arguments, 0);
+  return exports.normalize(filter(paths, function(p, index) {
+    return p && typeof p === 'string';
+  }).join('/'));
+};
+
+
+exports.dirname = function(path) {
+  var dir = splitPathRe.exec(path)[1] || '';
+  var isWindows = false;
+  if (!dir) {
+    // No dirname
+    return '.';
+  } else if (dir.length === 1 ||
+      (isWindows && dir.length <= 3 && dir.charAt(1) === ':')) {
+    // It is just a slash or a drive letter with a slash
+    return dir;
+  } else {
+    // It is a full dirname, strip trailing slash
+    return dir.substring(0, dir.length - 1);
+  }
+};
+
+
+exports.basename = function(path, ext) {
+  var f = splitPathRe.exec(path)[2] || '';
+  // TODO: make this comparison case-insensitive on windows?
+  if (ext && f.substr(-1 * ext.length) === ext) {
+    f = f.substr(0, f.length - ext.length);
+  }
+  return f;
+};
+
+
+exports.extname = function(path) {
+  return splitPathRe.exec(path)[3] || '';
+};
+
+});
+
+require.define("/lib/underscore.js", function (require, module, exports, __dirname, __filename) {
+    // Underscore.js 1.2.4
+// (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
+// Underscore is freely distributable under the MIT license.
+// Portions of Underscore are inspired or borrowed from Prototype,
+// Oliver Steele's Functional, and John Resig's Micro-Templating.
+// For all details and documentation:
+// http://documentcloud.github.com/underscore
+(function(){function r(a,c,d){if(a===c)return a!==0||1/a==1/c;if(a==null||c==null)return a===c;if(a._chain)a=a._wrapped;if(c._chain)c=c._wrapped;if(a.isEqual&&b.isFunction(a.isEqual))return a.isEqual(c);if(c.isEqual&&b.isFunction(c.isEqual))return c.isEqual(a);var e=l.call(a);if(e!=l.call(c))return false;switch(e){case "[object String]":return a==String(c);case "[object Number]":return a!=+a?c!=+c:a==0?1/a==1/c:a==+c;case "[object Date]":case "[object Boolean]":return+a==+c;case "[object RegExp]":return a.source==
+c.source&&a.global==c.global&&a.multiline==c.multiline&&a.ignoreCase==c.ignoreCase}if(typeof a!="object"||typeof c!="object")return false;for(var f=d.length;f--;)if(d[f]==a)return true;d.push(a);var f=0,g=true;if(e=="[object Array]"){if(f=a.length,g=f==c.length)for(;f--;)if(!(g=f in a==f in c&&r(a[f],c[f],d)))break}else{if("constructor"in a!="constructor"in c||a.constructor!=c.constructor)return false;for(var h in a)if(m.call(a,h)&&(f++,!(g=m.call(c,h)&&r(a[h],c[h],d))))break;if(g){for(h in c)if(m.call(c,
+h)&&!f--)break;g=!f}}d.pop();return g}var s=this,G=s._,o={},k=Array.prototype,p=Object.prototype,i=k.slice,H=k.unshift,l=p.toString,m=p.hasOwnProperty,w=k.forEach,x=k.map,y=k.reduce,z=k.reduceRight,A=k.filter,B=k.every,C=k.some,q=k.indexOf,D=k.lastIndexOf,p=Array.isArray,I=Object.keys,t=Function.prototype.bind,b=function(a){return new n(a)};if(typeof exports!=="undefined"){if(typeof module!=="undefined"&&module.exports)exports=module.exports=b;exports._=b}else typeof define==="function"&&define.amd?
+define("underscore",function(){return b}):s._=b;b.VERSION="1.2.4";var j=b.each=b.forEach=function(a,c,b){if(a!=null)if(w&&a.forEach===w)a.forEach(c,b);else if(a.length===+a.length)for(var e=0,f=a.length;e<f;e++){if(e in a&&c.call(b,a[e],e,a)===o)break}else for(e in a)if(m.call(a,e)&&c.call(b,a[e],e,a)===o)break};b.map=function(a,c,b){var e=[];if(a==null)return e;if(x&&a.map===x)return a.map(c,b);j(a,function(a,g,h){e[e.length]=c.call(b,a,g,h)});if(a.length===+a.length)e.length=a.length;return e};
+b.reduce=b.foldl=b.inject=function(a,c,d,e){var f=arguments.length>2;a==null&&(a=[]);if(y&&a.reduce===y)return e&&(c=b.bind(c,e)),f?a.reduce(c,d):a.reduce(c);j(a,function(a,b,i){f?d=c.call(e,d,a,b,i):(d=a,f=true)});if(!f)throw new TypeError("Reduce of empty array with no initial value");return d};b.reduceRight=b.foldr=function(a,c,d,e){var f=arguments.length>2;a==null&&(a=[]);if(z&&a.reduceRight===z)return e&&(c=b.bind(c,e)),f?a.reduceRight(c,d):a.reduceRight(c);var g=b.toArray(a).reverse();e&&!f&&
+(c=b.bind(c,e));return f?b.reduce(g,c,d,e):b.reduce(g,c)};b.find=b.detect=function(a,c,b){var e;E(a,function(a,g,h){if(c.call(b,a,g,h))return e=a,true});return e};b.filter=b.select=function(a,c,b){var e=[];if(a==null)return e;if(A&&a.filter===A)return a.filter(c,b);j(a,function(a,g,h){c.call(b,a,g,h)&&(e[e.length]=a)});return e};b.reject=function(a,c,b){var e=[];if(a==null)return e;j(a,function(a,g,h){c.call(b,a,g,h)||(e[e.length]=a)});return e};b.every=b.all=function(a,c,b){var e=true;if(a==null)return e;
+if(B&&a.every===B)return a.every(c,b);j(a,function(a,g,h){if(!(e=e&&c.call(b,a,g,h)))return o});return e};var E=b.some=b.any=function(a,c,d){c||(c=b.identity);var e=false;if(a==null)return e;if(C&&a.some===C)return a.some(c,d);j(a,function(a,b,h){if(e||(e=c.call(d,a,b,h)))return o});return!!e};b.include=b.contains=function(a,c){var b=false;if(a==null)return b;return q&&a.indexOf===q?a.indexOf(c)!=-1:b=E(a,function(a){return a===c})};b.invoke=function(a,c){var d=i.call(arguments,2);return b.map(a,
+function(a){return(b.isFunction(c)?c||a:a[c]).apply(a,d)})};b.pluck=function(a,c){return b.map(a,function(a){return a[c]})};b.max=function(a,c,d){if(!c&&b.isArray(a))return Math.max.apply(Math,a);if(!c&&b.isEmpty(a))return-Infinity;var e={computed:-Infinity};j(a,function(a,b,h){b=c?c.call(d,a,b,h):a;b>=e.computed&&(e={value:a,computed:b})});return e.value};b.min=function(a,c,d){if(!c&&b.isArray(a))return Math.min.apply(Math,a);if(!c&&b.isEmpty(a))return Infinity;var e={computed:Infinity};j(a,function(a,
+b,h){b=c?c.call(d,a,b,h):a;b<e.computed&&(e={value:a,computed:b})});return e.value};b.shuffle=function(a){var c=[],b;j(a,function(a,f){f==0?c[0]=a:(b=Math.floor(Math.random()*(f+1)),c[f]=c[b],c[b]=a)});return c};b.sortBy=function(a,c,d){return b.pluck(b.map(a,function(a,b,g){return{value:a,criteria:c.call(d,a,b,g)}}).sort(function(a,b){var c=a.criteria,d=b.criteria;return c<d?-1:c>d?1:0}),"value")};b.groupBy=function(a,c){var d={},e=b.isFunction(c)?c:function(a){return a[c]};j(a,function(a,b){var c=
+e(a,b);(d[c]||(d[c]=[])).push(a)});return d};b.sortedIndex=function(a,c,d){d||(d=b.identity);for(var e=0,f=a.length;e<f;){var g=e+f>>1;d(a[g])<d(c)?e=g+1:f=g}return e};b.toArray=function(a){return!a?[]:a.toArray?a.toArray():b.isArray(a)?i.call(a):b.isArguments(a)?i.call(a):b.values(a)};b.size=function(a){return b.toArray(a).length};b.first=b.head=function(a,b,d){return b!=null&&!d?i.call(a,0,b):a[0]};b.initial=function(a,b,d){return i.call(a,0,a.length-(b==null||d?1:b))};b.last=function(a,b,d){return b!=
+null&&!d?i.call(a,Math.max(a.length-b,0)):a[a.length-1]};b.rest=b.tail=function(a,b,d){return i.call(a,b==null||d?1:b)};b.compact=function(a){return b.filter(a,function(a){return!!a})};b.flatten=function(a,c){return b.reduce(a,function(a,e){if(b.isArray(e))return a.concat(c?e:b.flatten(e));a[a.length]=e;return a},[])};b.without=function(a){return b.difference(a,i.call(arguments,1))};b.uniq=b.unique=function(a,c,d){var d=d?b.map(a,d):a,e=[];b.reduce(d,function(d,g,h){if(0==h||(c===true?b.last(d)!=
+g:!b.include(d,g)))d[d.length]=g,e[e.length]=a[h];return d},[]);return e};b.union=function(){return b.uniq(b.flatten(arguments,true))};b.intersection=b.intersect=function(a){var c=i.call(arguments,1);return b.filter(b.uniq(a),function(a){return b.every(c,function(c){return b.indexOf(c,a)>=0})})};b.difference=function(a){var c=b.flatten(i.call(arguments,1));return b.filter(a,function(a){return!b.include(c,a)})};b.zip=function(){for(var a=i.call(arguments),c=b.max(b.pluck(a,"length")),d=Array(c),e=
+0;e<c;e++)d[e]=b.pluck(a,""+e);return d};b.indexOf=function(a,c,d){if(a==null)return-1;var e;if(d)return d=b.sortedIndex(a,c),a[d]===c?d:-1;if(q&&a.indexOf===q)return a.indexOf(c);for(d=0,e=a.length;d<e;d++)if(d in a&&a[d]===c)return d;return-1};b.lastIndexOf=function(a,b){if(a==null)return-1;if(D&&a.lastIndexOf===D)return a.lastIndexOf(b);for(var d=a.length;d--;)if(d in a&&a[d]===b)return d;return-1};b.range=function(a,b,d){arguments.length<=1&&(b=a||0,a=0);for(var d=arguments[2]||1,e=Math.max(Math.ceil((b-
+a)/d),0),f=0,g=Array(e);f<e;)g[f++]=a,a+=d;return g};var F=function(){};b.bind=function(a,c){var d,e;if(a.bind===t&&t)return t.apply(a,i.call(arguments,1));if(!b.isFunction(a))throw new TypeError;e=i.call(arguments,2);return d=function(){if(!(this instanceof d))return a.apply(c,e.concat(i.call(arguments)));F.prototype=a.prototype;var b=new F,g=a.apply(b,e.concat(i.call(arguments)));return Object(g)===g?g:b}};b.bindAll=function(a){var c=i.call(arguments,1);c.length==0&&(c=b.functions(a));j(c,function(c){a[c]=
+b.bind(a[c],a)});return a};b.memoize=function(a,c){var d={};c||(c=b.identity);return function(){var b=c.apply(this,arguments);return m.call(d,b)?d[b]:d[b]=a.apply(this,arguments)}};b.delay=function(a,b){var d=i.call(arguments,2);return setTimeout(function(){return a.apply(a,d)},b)};b.defer=function(a){return b.delay.apply(b,[a,1].concat(i.call(arguments,1)))};b.throttle=function(a,c){var d,e,f,g,h,i=b.debounce(function(){h=g=false},c);return function(){d=this;e=arguments;var b;f||(f=setTimeout(function(){f=
+null;h&&a.apply(d,e);i()},c));g?h=true:a.apply(d,e);i();g=true}};b.debounce=function(a,b){var d;return function(){var e=this,f=arguments;clearTimeout(d);d=setTimeout(function(){d=null;a.apply(e,f)},b)}};b.once=function(a){var b=false,d;return function(){if(b)return d;b=true;return d=a.apply(this,arguments)}};b.wrap=function(a,b){return function(){var d=[a].concat(i.call(arguments,0));return b.apply(this,d)}};b.compose=function(){var a=arguments;return function(){for(var b=arguments,d=a.length-1;d>=
+0;d--)b=[a[d].apply(this,b)];return b[0]}};b.after=function(a,b){return a<=0?b():function(){if(--a<1)return b.apply(this,arguments)}};b.keys=I||function(a){if(a!==Object(a))throw new TypeError("Invalid object");var b=[],d;for(d in a)m.call(a,d)&&(b[b.length]=d);return b};b.values=function(a){return b.map(a,b.identity)};b.functions=b.methods=function(a){var c=[],d;for(d in a)b.isFunction(a[d])&&c.push(d);return c.sort()};b.extend=function(a){j(i.call(arguments,1),function(b){for(var d in b)b[d]!==
+void 0&&(a[d]=b[d])});return a};b.defaults=function(a){j(i.call(arguments,1),function(b){for(var d in b)a[d]==null&&(a[d]=b[d])});return a};b.clone=function(a){return!b.isObject(a)?a:b.isArray(a)?a.slice():b.extend({},a)};b.tap=function(a,b){b(a);return a};b.isEqual=function(a,b){return r(a,b,[])};b.isEmpty=function(a){if(b.isArray(a)||b.isString(a))return a.length===0;for(var c in a)if(m.call(a,c))return false;return true};b.isElement=function(a){return!!(a&&a.nodeType==1)};b.isArray=p||function(a){return l.call(a)==
+"[object Array]"};b.isObject=function(a){return a===Object(a)};b.isArguments=function(a){return l.call(a)=="[object Arguments]"};if(!b.isArguments(arguments))b.isArguments=function(a){return!(!a||!m.call(a,"callee"))};b.isFunction=function(a){return l.call(a)=="[object Function]"};b.isString=function(a){return l.call(a)=="[object String]"};b.isNumber=function(a){return l.call(a)=="[object Number]"};b.isNaN=function(a){return a!==a};b.isBoolean=function(a){return a===true||a===false||l.call(a)=="[object Boolean]"};
+b.isDate=function(a){return l.call(a)=="[object Date]"};b.isRegExp=function(a){return l.call(a)=="[object RegExp]"};b.isNull=function(a){return a===null};b.isUndefined=function(a){return a===void 0};b.noConflict=function(){s._=G;return this};b.identity=function(a){return a};b.times=function(a,b,d){for(var e=0;e<a;e++)b.call(d,e)};b.escape=function(a){return(""+a).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;").replace(/\//g,"&#x2F;")};
+b.mixin=function(a){j(b.functions(a),function(c){J(c,b[c]=a[c])})};var K=0;b.uniqueId=function(a){var b=K++;return a?a+b:b};b.templateSettings={evaluate:/<%([\s\S]+?)%>/g,interpolate:/<%=([\s\S]+?)%>/g,escape:/<%-([\s\S]+?)%>/g};var u=/.^/;b.template=function(a,c){var d=b.templateSettings,d="var __p=[],print=function(){__p.push.apply(__p,arguments);};with(obj||{}){__p.push('"+a.replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(d.escape||u,function(a,b){return"',_.escape("+b.replace(/\\'/g,"'")+"),'"}).replace(d.interpolate||
+u,function(a,b){return"',"+b.replace(/\\'/g,"'")+",'"}).replace(d.evaluate||u,function(a,b){return"');"+b.replace(/\\'/g,"'").replace(/[\r\n\t]/g," ").replace(/\\\\/g,"\\")+";__p.push('"}).replace(/\r/g,"\\r").replace(/\n/g,"\\n").replace(/\t/g,"\\t")+"');}return __p.join('');",e=new Function("obj","_",d);return c?e(c,b):function(a){return e.call(this,a,b)}};b.chain=function(a){return b(a).chain()};var n=function(a){this._wrapped=a};b.prototype=n.prototype;var v=function(a,c){return c?b(a).chain():
+a},J=function(a,c){n.prototype[a]=function(){var a=i.call(arguments);H.call(a,this._wrapped);return v(c.apply(b,a),this._chain)}};b.mixin(b);j("pop,push,reverse,shift,sort,splice,unshift".split(","),function(a){var b=k[a];n.prototype[a]=function(){var d=this._wrapped;b.apply(d,arguments);var e=d.length;(a=="shift"||a=="splice")&&e===0&&delete d[0];return v(d,this._chain)}});j(["concat","join","slice"],function(a){var b=k[a];n.prototype[a]=function(){return v(b.apply(this._wrapped,arguments),this._chain)}});
+n.prototype.chain=function(){this._chain=true;return this};n.prototype.value=function(){return this._wrapped}}).call(this);
+
+});
+
+require.define("/lib/flywheel.js", function (require, module, exports, __dirname, __filename) {
+    void function(root){
+    
+    // shim for cross-browser requestAnimationFrame, 
+    // with setTimeout for a backup for older browsers
+    var request_animation_frame = function () {
+        return  window.requestAnimationFrame       
+            ||  window.webkitRequestAnimationFrame 
+            ||  window.mozRequestAnimationFrame
+            ||  window.oRequestAnimationFrame
+            ||  window.msRequestAnimationFrame
+            ||  function (callback) {
+                setTimeout(function () {
+                    callback(+new Date())
+                }, 1000 / 60)
+            } 
+    }()
+    
+
+    //// controller : Object
+    // 
+    // gets returned from flywheel to let the
+    // user manipulate the looping
+    var controller = {
+        
+        // --- Attributes --- // 
+        callback:           undefined,
+        element:            undefined,
+        framerate_cap:      33,
+        default_framerate:  16,
+        
+        _last_timestamp:    undefined,
+        _running:           false,
+        
+
+        // --- Methods --- //
+        start: function(){
+            this._running = true
+            this._next_frame(undefined, this.default_framerate) 
+            return this
+        },
+
+        stop: function(){
+            this._running = false
+            return this
+        },
+        
+        toggle: function(){
+            this._running ? this.stop()
+            : /*otherwise*/ this.start()
+            return this
+        },
+
+        step: function(time_delta){
+            this._next_frame(undefined, time_delta || this.default_framerate)
+            return this
+        },
+
+        //// (timestamp : Number || undefined [, time_delta : Number]) -> undefined
+        //
+        // This is the function that is looped over. `time_delta` lets methods
+        // such as `step` pass a time_delta directly in.
+        _next_frame: function(timestamp, time_delta){
+            
+            // set up next frame
+            if ( this._running ) 
+                request_animation_frame(this._next_frame.bind(this), this.element)
+            
+            // calculate time_delta from timestamp if a time_delta was not passed in
+            if ( typeof time_delta === "undefined" ) {
+                time_delta = timestamp - this._last_timestamp
+                if ( time_delta > this.framerate_cap ) time_delta = this.framerate_cap
+                this._last_timestamp = timestamp
+            }  
+            
+            // if time_delta is 0 or NaN (etc), we may not want to call callback
+            if ( time_delta ) this.callback(time_delta)
+            
+        }
+    }
+
+
+    //// (callback : Function[, element : HTMLElement ]) -> controller : Object
+    //
+    //  Public API for flywheel.  Just a wrapper around
+    //  an instance of the controller object, really.
+    function flywheel(callback, element){
+        
+        var ret_controller = Object.create(controller)
+        
+        ret_controller.callback = callback
+        ret_controller.element  = element
+        
+        return ret_controller 
+    }
+
+    //// export using commonjs or into the global scope
+    if ( typeof module !== "undefined" && module["exports"] )
+        module["exports"] = flywheel
+    else
+        root["flywheel"] = flywheel
+
+}(this)
+
+});
+
+require.define("/event.coffee", function (require, module, exports, __dirname, __filename) {
+    
+
+
+});
+
+require.define("/render.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var draw, render;
+
+  render = module.exports._render = {};
+
+  render.clear_context = function(context) {
+    var can;
+    can = context.canvas;
+    context.clearRect(0, 0, can.width, can.width);
+    return context;
+  };
+
+  render.actor = function(actor, context) {
+    var offset;
+    if ((actor.draw != null) && (actor.color != null) && actor.alpha > 0) {
+      offset = actor._meta.offset;
+      context.globalAlpha = actor.alpha * offset.alpha;
+      draw[actor.draw](actor, offset, context);
+    }
+    return actor;
+  };
+
+  draw = {
+    rect: function(actor, offset, context) {
+      context.fillStyle = actor.color;
+      return context.fillRect(actor.x + offset.x, actor.y + offset.y, actor.width, actor.height);
+    }
+  };
+
+}).call(this);
+
+});
+
+require.define("/run.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var actor_, flywheel, pure, render_, step_actor, step_world, _;
+
+  flywheel = require('./lib/flywheel');
+
+  _ = require('./lib/underscore');
+
+  render_ = require('./render.coffee')._render;
+
+  actor_ = require('./actor.coffee')._actor;
+
+  pure = module.exports;
+
+  pure.run = function(world, context) {
+    var func;
+    func = function(time_delta) {
+      return step_world(world, context, time_delta);
+    };
+    return flywheel(func).start();
+  };
+
+  step_world = function(world, context, time_delta) {
+    var func;
+    render_.clear_context(context);
+    func = function(actor) {
+      return step_actor(actor, context, time_delta);
+    };
+    actor_.walk_apply(world, func);
+    return world;
+  };
+
+  step_actor = function(actor, context, time_delta) {
+    actor_.calc_offset(actor);
+    render_.actor(actor, context);
+    return actor;
+  };
+
+}).call(this);
+
+});
+
+require.define("/animate.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var Animation, animate, private, pure, _;
+
+  _ = require('./lib/underscore');
+
+  pure = module.exports;
+
+  private = pure._animation;
+
+  Animation = function() {
+    return {
+      "for": 0,
+      by: null,
+      easing: 'linear',
+      time: 0
+    };
+  };
+
+  pure.animate = animate = function(actor, settings) {
+    if (_.isArray(settings)) {
+      return _.map(settings, function(settings) {
+        return animate(actor, settings);
+      });
+    }
+    if (_.isArray(actor)) {
+      return _.map(actor, function(actor) {
+        return animate(actor, settings);
+      });
+    }
+    actor._meta.anim_q.push(_.extend(Animation(), settings));
+    return actor;
+  };
+
+}).call(this);
+
+});
+
+require.define("/actor.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var Actor, Meta, Offset, add, private, pure, walk_apply, _;
+
+  _ = require('./lib/underscore');
+
+  pure = module.exports;
+
+  private = pure._actor = {};
+
+  Actor = function() {
+    return {
+      draw: null,
+      alpha: 1,
+      color: '#000',
+      x: 0,
+      y: 0,
+      height: 10,
+      width: 10,
+      update: null,
+      click: null,
+      collide: null,
+      _meta: Meta()
+    };
+  };
+
+  Meta = function() {
+    return {
+      offset: Offset(),
+      parent: null,
+      children: [],
+      anim_q: [],
+      active: true,
+      dead: false,
+      time: 0
+    };
+  };
+
+  Offset = function() {
+    return {
+      x: 0,
+      y: 0,
+      alpha: 1,
+      add: ['x', 'y'],
+      multiply: ['alpha']
+    };
+  };
+
+  pure.create = function(settings) {
+    return _.extend(Actor(), settings);
+  };
+
+  pure.factory = function(orig_settings) {
+    return function(settings) {
+      var actor;
+      actor = Actor();
+      _.extend(actor, orig_settings);
+      return _.extend(actor, settings);
+    };
+  };
+
+  pure.add = add = function(parent, child) {
+    if (_.isArray(child)) {
+      return _.map(child, function(child) {
+        return add(parent, child);
+      });
+    }
+    parent._meta.children.push(child);
+    child._meta.parent = parent;
+    return parent;
+  };
+
+  pure.kill = function(actor) {
+    actor._meta.dead = true;
+    return actor;
+  };
+
+  pure.activate = function(actor) {
+    actor._meta.active = true;
+    return actor;
+  };
+
+  pure.deactivate = function(actor) {
+    actor._meta.active = false;
+    return actor;
+  };
+
+  private.walk_apply = walk_apply = function(actor, func) {
+    var children;
+    if (!actor._meta.active) return actor;
+    func(actor);
+    children = actor._meta.children;
+    if (children.length) {
+      _.map(children, function(actor) {
+        return walk_apply(actor, func);
+      });
+    }
+    return actor;
+  };
+
+  private.calc_offset = function(actor) {
+    var offset, parent, parent_o;
+    offset = actor._meta.offset;
+    parent = actor._meta.parent;
+    if (parent != null) {
+      parent_o = parent != null ? parent._meta.offset : void 0;
+      _.each(offset.multiply, function(key) {
+        return offset[key] = parent[key] * parent_o[key];
+      });
+      _.each(offset.add, function(key) {
+        return offset[key] = parent[key] + parent_o[key];
+      });
+    }
+    return actor;
+  };
+
+}).call(this);
+
+});
+
+require.define("/pure.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var pure, _;
+
+  _ = require('./lib/underscore');
+
+  pure = module.exports;
+
+  _.extend(pure, require('./render.coffee'));
+
+  _.extend(pure, require('./event.coffee'));
+
+  _.extend(pure, require('./run.coffee'));
+
+  _.extend(pure, require('./actor.coffee'));
+
+  _.extend(pure, require('./animate.coffee'));
+
+}).call(this);
+
+});
+require("/pure.coffee");
