@@ -100,3 +100,8 @@ private.calc_offset = ( actor ) ->
             offset[key] = parent[key] + parent_o[key]
         )
     actor
+
+private.remove = ( actor ) ->
+    parent = actor._meta.parent
+    parent._meta.children = _.without(parent._meta.children, actor)
+    actor

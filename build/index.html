@@ -12,6 +12,13 @@
           , world   = pure.create({ draw: 'rect', x: 50 })
           , actor   = pure.create({ draw: 'rect', x: 100, y: 0, color: 'red' })
 
+        actor.update = function(td){
+            this.y += 0.1 * td
+            
+            if ( this.y > 100 )
+                pure.kill(this)
+        }
+
         pure.add(world, actor)
         pure.run(world, context)
     </script>

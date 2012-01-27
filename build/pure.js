@@ -466,120 +466,6 @@ require.define("/event.coffee", function (require, module, exports, __dirname, _
 
 });
 
-require.define("/render.coffee", function (require, module, exports, __dirname, __filename) {
-    (function() {
-  var draw, render;
-
-  render = module.exports._render = {};
-
-  render.clear_context = function(context) {
-    var can;
-    can = context.canvas;
-    context.clearRect(0, 0, can.width, can.width);
-    return context;
-  };
-
-  render.actor = function(actor, context) {
-    var offset;
-    if ((actor.draw != null) && (actor.color != null) && actor.alpha > 0) {
-      offset = actor._meta.offset;
-      context.globalAlpha = actor.alpha * offset.alpha;
-      draw[actor.draw](actor, offset, context);
-    }
-    return actor;
-  };
-
-  draw = {
-    rect: function(actor, offset, context) {
-      context.fillStyle = actor.color;
-      return context.fillRect(actor.x + offset.x, actor.y + offset.y, actor.width, actor.height);
-    }
-  };
-
-}).call(this);
-
-});
-
-require.define("/run.coffee", function (require, module, exports, __dirname, __filename) {
-    (function() {
-  var actor_, flywheel, pure, render_, step_actor, step_world, _;
-
-  flywheel = require('./lib/flywheel');
-
-  _ = require('./lib/underscore');
-
-  render_ = require('./render.coffee')._render;
-
-  actor_ = require('./actor.coffee')._actor;
-
-  pure = module.exports;
-
-  pure.run = function(world, context) {
-    var func;
-    func = function(time_delta) {
-      return step_world(world, context, time_delta);
-    };
-    return flywheel(func).start();
-  };
-
-  step_world = function(world, context, time_delta) {
-    var func;
-    render_.clear_context(context);
-    func = function(actor) {
-      return step_actor(actor, context, time_delta);
-    };
-    actor_.walk_apply(world, func);
-    return world;
-  };
-
-  step_actor = function(actor, context, time_delta) {
-    actor_.calc_offset(actor);
-    render_.actor(actor, context);
-    return actor;
-  };
-
-}).call(this);
-
-});
-
-require.define("/animate.coffee", function (require, module, exports, __dirname, __filename) {
-    (function() {
-  var Animation, animate, private, pure, _;
-
-  _ = require('./lib/underscore');
-
-  pure = module.exports;
-
-  private = pure._animation;
-
-  Animation = function() {
-    return {
-      "for": 0,
-      by: null,
-      easing: 'linear',
-      time: 0
-    };
-  };
-
-  pure.animate = animate = function(actor, settings) {
-    if (_.isArray(settings)) {
-      return _.map(settings, function(settings) {
-        return animate(actor, settings);
-      });
-    }
-    if (_.isArray(actor)) {
-      return _.map(actor, function(actor) {
-        return animate(actor, settings);
-      });
-    }
-    actor._meta.anim_q.push(_.extend(Animation(), settings));
-    return actor;
-  };
-
-}).call(this);
-
-});
-
 require.define("/actor.coffee", function (require, module, exports, __dirname, __filename) {
     (function() {
   var Actor, Meta, Offset, add, private, pure, walk_apply, _;
@@ -693,6 +579,133 @@ require.define("/actor.coffee", function (require, module, exports, __dirname, _
         return offset[key] = parent[key] + parent_o[key];
       });
     }
+    return actor;
+  };
+
+  private.remove = function(actor) {
+    var parent;
+    parent = actor._meta.parent;
+    parent._meta.children = _.without(parent._meta.children, actor);
+    return actor;
+  };
+
+}).call(this);
+
+});
+
+require.define("/render.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var draw, render;
+
+  render = module.exports._render = {};
+
+  render.clear_context = function(context) {
+    var can;
+    can = context.canvas;
+    context.clearRect(0, 0, can.width, can.width);
+    return context;
+  };
+
+  render.actor = function(actor, context) {
+    var offset;
+    if ((actor.draw != null) && (actor.color != null) && actor.alpha > 0) {
+      offset = actor._meta.offset;
+      context.globalAlpha = actor.alpha * offset.alpha;
+      draw[actor.draw](actor, offset, context);
+    }
+    return actor;
+  };
+
+  draw = {
+    rect: function(actor, offset, context) {
+      context.fillStyle = actor.color;
+      return context.fillRect(actor.x + offset.x, actor.y + offset.y, actor.width, actor.height);
+    }
+  };
+
+}).call(this);
+
+});
+
+require.define("/run.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var actor_, flywheel, pure, render_, step_actor, step_world, _;
+
+  flywheel = require('./lib/flywheel');
+
+  _ = require('./lib/underscore');
+
+  render_ = require('./render.coffee')._render;
+
+  actor_ = require('./actor.coffee')._actor;
+
+  pure = module.exports;
+
+  pure.run = function(world, context) {
+    var func;
+    func = function(time_delta) {
+      return step_world(world, context, time_delta);
+    };
+    return flywheel(func).start();
+  };
+
+  step_world = function(world, context, time_delta) {
+    var func;
+    render_.clear_context(context);
+    func = function(actor) {
+      return step_actor(actor, context, time_delta);
+    };
+    actor_.walk_apply(world, func);
+    return world;
+  };
+
+  step_actor = function(actor, context, time_delta) {
+    if (actor._meta.dead) {
+      actor_.remove(actor);
+      console.log('yes');
+      return;
+    }
+    if (typeof actor.update === "function") actor.update(time_delta);
+    actor_.calc_offset(actor);
+    render_.actor(actor, context);
+    return actor;
+  };
+
+}).call(this);
+
+});
+
+require.define("/animate.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var Animation, animate, private, pure, _;
+
+  _ = require('./lib/underscore');
+
+  pure = module.exports;
+
+  private = pure._animation;
+
+  Animation = function() {
+    return {
+      "for": 0,
+      by: null,
+      easing: 'linear',
+      time: 0
+    };
+  };
+
+  pure.animate = animate = function(actor, settings) {
+    if (_.isArray(settings)) {
+      return _.map(settings, function(settings) {
+        return animate(actor, settings);
+      });
+    }
+    if (_.isArray(actor)) {
+      return _.map(actor, function(actor) {
+        return animate(actor, settings);
+      });
+    }
+    actor._meta.anim_q.push(_.extend(Animation(), settings));
     return actor;
   };
 
