@@ -8,12 +8,14 @@
     <script src="pure.js"></script>
     <script>
         var pure    = require("./pure.coffee")
+          , world   = pure.World()
           , level   = pure.Level()
           , actor   = pure.Actor()
-
+        
+        pure.add(world, level)
         pure.add(level, actor)
 
-        pure.run(level)
+        pure.run(world, document.getElementById('main'))
     </script>
 </body>
 </html>

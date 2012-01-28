@@ -23,8 +23,14 @@ World_Meta = ->
 # type-specific functions
 funcs = {}
 
+
 funcs.step = ( world, context, timedelta ) ->
-    console.log 'yes'
+    level = world.levels[world.current]
+    level._funcs.step(level, context, timedelta)
+
+funcs.render = ( world, context ) ->
+    level = world.levels[world.current]
+    level._funcs.render(level, context)
 
 funcs.add = ( world, level ) ->
     world.levels.push level

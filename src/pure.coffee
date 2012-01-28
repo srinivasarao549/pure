@@ -18,11 +18,13 @@ pure.factory = ( constructor, old_settings ) ->
         _.extend(ret, new_settings)
 
 
-pure.run = ( pure_obj, context ) ->
-    cb = ( time_delta ) ->
+pure.run = ( pure_obj, canvas ) ->
+    context = canvas.getContext('2d')
+    cb      = ( time_delta ) ->
         pure_obj._funcs.step(pure_obj, context, time_delta)
+        context.clearRect(0, 0, canvas.width, canvas.heigh:)
+        pure_obj._funcs.render(pure_obj, context)
     flywheel(cb).start()
-
 
 pure.add = ( a, b ) -> 
     a._funcs.add(a, b)

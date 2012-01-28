@@ -9,11 +9,18 @@ pure.Actor = ( settings ) ->
 
 # constructors
 Actor_ = ->
-    x       : 0
+    x       : 0         # position/draw
     y       : 0
-    alpha   : 0
-    shape   : 0
-    _meta   : Actor_Meta()
+    width   : 100
+    height  : 100
+    alpha   : 0 
+    touch   : null      # event handlers
+    drag    : null
+    keydown : null
+    keyup   : null
+    keypress: null
+    update  : null
+    _meta   : Actor_Meta()  # internal data
     _funcs  : funcs
 
 Actor_Meta = ->
@@ -25,4 +32,7 @@ Actor_Meta = ->
 funcs = {}
 
 funcs.step = ( actor, context, timedelta ) -> 
-    console.log actor._meta.id
+    actor.update?(timedelta)
+
+funcs.render = ( actor, context ) ->
+    context.fillRect(actor.x, actor.y, actor.width, actor.height)
