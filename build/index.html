@@ -8,19 +8,12 @@
     <script src="pure.js"></script>
     <script>
         var pure    = require("./pure.coffee")
-          , context = document.getElementById("main").getContext("2d")
-          , world   = pure.create({ draw: 'rect', x: 50 })
-          , actor   = pure.create({ draw: 'rect', x: 100, y: 0, color: 'red' })
+          , level   = pure.Level()
+          , actor   = pure.Actor()
 
-        actor.update = function(td){
-            this.y += 0.1 * td
-            
-            if ( this.y > 100 )
-                pure.kill(this)
-        }
+        pure.add(level, actor)
 
-        pure.add(world, actor)
-        pure.run(world, context)
+        pure.run(level)
     </script>
 </body>
 </html>

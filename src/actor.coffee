@@ -1,107 +1,28 @@
-#imports
-_    = require './lib/underscore'
+# imports
+_       = require './lib/underscore'
 
-# namespace
-pure = module.exports
-private = pure._actor = {}
+# exports
+pure    = module.exports
 
-# Constructors
-Actor = ->
-    draw    : null      # draw 
-    alpha   : 1         
-    color   : '#000'
-    x       : 0         # position
-    y       : 0
-    height  : 10
-    width   : 10
-    update  : null      # events
-    click   : null
-    collide : null
-    _meta   : Meta()    # metadata
+pure.Actor = ( settings ) ->
+    _.extend(Actor_(), settings)
 
-Meta = ->
-    offset   : Offset()
-    parent   : null
-    children : []
-    anim_q   : []
-    active   : true
-    dead     : false
-    time     : 0
-
-Offset = ->
+# constructors
+Actor_ = ->
     x       : 0
     y       : 0
-    alpha   : 1
-    add     : ['x', 'y']
-    multiply: ['alpha']
+    alpha   : 0
+    shape   : 0
+    _meta   : Actor_Meta()
+    _funcs  : funcs
 
-# public API
+Actor_Meta = ->
+    type    : 'Actor'
+    id      : 0
+    dead    : false
 
-# create :: {} -> Actor
-pure.create = ( settings ) ->
-    _.extend(Actor(), settings)
+# typeclass
+funcs = {}
 
-# factory :: {} -> ( {} -> Actor )
-pure.factory = ( orig_settings ) ->
-    ( settings ) -> 
-        actor = Actor()
-        _.extend(actor, orig_settings)
-        _.extend(actor, settings)
-
-# add :: Actor, Actor -> Actor
-pure.add = add = ( parent, child ) ->
-    if _.isArray(child)
-        return _.map(child, (child) -> add(parent, child))
-    parent._meta.children.push child
-    child._meta.parent = parent
-    parent
-
-# kill :: Actor -> Actor
-pure.kill = ( actor ) ->
-    actor._meta.dead = true
-    actor
-
-# activate :: Actor -> Actor
-pure.activate = ( actor ) ->
-    actor._meta.active = true
-    actor
-
-# deactivate :: Actor -> Actor
-pure.deactivate = ( actor ) ->
-    actor._meta.active = false
-    actor
-
-
-# private API
-
-# walk_apply :: Actor, function -> Actor
-private.walk_apply = walk_apply = ( actor, func ) ->
-    if not actor._meta.active then return actor
-    func actor
-    
-    children = actor._meta.children
-    if children.length
-        _.map( children, ( actor )-> walk_apply(actor, func))
-
-    actor
-
-
-# calc_offset :: Actor -> Actor
-private.calc_offset = ( actor ) ->
-    offset = actor._meta.offset
-    parent = actor._meta.parent
-
-    if parent?
-        parent_o = parent?._meta.offset
-        _.each(offset.multiply, (key) ->
-            offset[key] = parent[key] * parent_o[key]
-        )
-        _.each(offset.add, (key) ->
-            offset[key] = parent[key] + parent_o[key]
-        )
-    actor
-
-private.remove = ( actor ) ->
-    parent = actor._meta.parent
-    parent._meta.children = _.without(parent._meta.children, actor)
-    actor
+funcs.step = ( actor, context, timedelta ) -> 
+    console.log actor._meta.id
