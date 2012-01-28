@@ -23,6 +23,8 @@ Level_Meta = ->
 funcs = {}
 
 funcs.step = ( level, context, timedelta ) ->
+    level.actors.sort (a, b) ->
+        a.z - b.z
     _.each(level.actors, ( actor ) ->
         actor._funcs.step(actor, context, timedelta)
     )
