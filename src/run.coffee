@@ -29,7 +29,6 @@ step_world = ( world, context, time_delta ) ->
 step_actor = ( actor, context, time_delta ) ->
     if actor._meta.dead
         actor_.remove(actor)
-        console.log 'yes'
         return
     actor.update?(time_delta)
     actor_.calc_offset(actor)
