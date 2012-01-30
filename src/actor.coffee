@@ -4,14 +4,10 @@ _       = require './lib/underscore'
 # exports
 pure    = module.exports
 
-pure.Actor = ( settings ) ->
-    _.extend(Actor_(), settings)
-
 # constructors
-Actor_ = ->
+Actor = ->
     x       : 0         # position/draw
     y       : 0
-    z       : 0
     width   : 100
     height  : 100
     alpha   : 1
@@ -23,25 +19,27 @@ Actor_ = ->
     keyup   : null
     keypress: null
     update  : null
-    _meta   : Actor_Meta()  # internal data
-    _funcs  : funcs
+    _meta   : Meta()
 
-Actor_Meta = ->
-    type    : 'Actor'
-    id      : 0
-    dead    : false
+Meta = -> 
+    children: []
+    paused  : false
+    active  : true
 
-# typeclass
-funcs = {}
+# public
 
-funcs.step = ( actor, context, timedelta ) -> 
-    actor.update?(timedelta)
+# create :: object -> Actor
+pure.create = ( settings ) ->
+    _.extend(Actor(), settings)
 
-funcs.render = ( actor, context ) ->
-    if actor.alpha 
-        context.globalAlpha = actor.alpha
-    if actor.color?
-        context.fillStyle = actor.color
-        context.fillRect(actor.x, actor.y, actor.width, actor.height)
-    if actor.image?
-        context.drawImage(actor.image, actor.x, actor.y)
+# factory :: object -> ( object -> Actor )
+pure.factory = ( o_settings ) ->
+    ( n_settings ) ->
+        a = _.extend(Actor(), o_settings)
+        _.extend(a, n_settings)
+
+# add :: Actor, Actor || [Actor] -> Actor
+pure.add = add = ( parent, child ) ->
+    if _.isArray child 
+        return _.each(child, (c) -> add(parent, c))
+    parent._meta.children.push child

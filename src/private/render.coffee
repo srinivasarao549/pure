@@ -2,5 +2,6 @@
 _       = require './lib/underscore'
 
 # exports
-pure = module.exports
+render = module.exports
 
+render.
