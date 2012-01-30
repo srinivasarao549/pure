@@ -460,45 +460,6 @@ require.define("/lib/flywheel.js", function (require, module, exports, __dirname
 
 });
 
-require.define("/private/render.coffee", function (require, module, exports, __dirname, __filename) {
-    (function() {
-  var render, _;
-
-  _ = require('../lib/underscore');
-
-  render = module.exports;
-
-  render.clear = function(context) {
-    var c;
-    c = context.canvas;
-    return context.clearRect(0, 0, c.width, c.height);
-  };
-
-  render.actor = function(actor, context) {
-    var t_pos;
-    context.globalAlpha = actor.alpha;
-    t_pos = {
-      x: actor._meta.true_x,
-      y: actor._meta.true_y
-    };
-    if (actor.lineWidth != null) context.lineWidth = actor.lineWidth;
-    if (actor.strokeStyle != null) {
-      context.strokeStyle = actor.strokeStyle;
-      context.strokeRect(t_pos.x, t_pos.y, actor.width, actor.height);
-    }
-    if (actor.fillStyle != null) {
-      context.fillStyle = actor.fillStyle;
-      context.fillRect(t_pos.x, t_pos.y, actor.width, actor.height);
-    }
-    if (actor.image != null) {
-      return context.drawImage(actor.image, t_pos.x, t_pos.y);
-    }
-  };
-
-}).call(this);
-
-});
-
 require.define("/actor.coffee", function (require, module, exports, __dirname, __filename) {
     (function() {
   var Actor, Meta, add, create, pure, _;
@@ -623,6 +584,45 @@ require.define("/run.coffee", function (require, module, exports, __dirname, __f
     if (p != null) {
       a._meta.true_x += p._meta.true_x;
       return a._meta.true_y += p._meta.true_y;
+    }
+  };
+
+}).call(this);
+
+});
+
+require.define("/private/render.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var render, _;
+
+  _ = require('../lib/underscore');
+
+  render = module.exports;
+
+  render.clear = function(context) {
+    var c;
+    c = context.canvas;
+    return context.clearRect(0, 0, c.width, c.height);
+  };
+
+  render.actor = function(actor, context) {
+    var t_pos;
+    context.globalAlpha = actor.alpha;
+    t_pos = {
+      x: actor._meta.true_x,
+      y: actor._meta.true_y
+    };
+    if (actor.lineWidth != null) context.lineWidth = actor.lineWidth;
+    if (actor.strokeStyle != null) {
+      context.strokeStyle = actor.strokeStyle;
+      context.strokeRect(t_pos.x, t_pos.y, actor.width, actor.height);
+    }
+    if (actor.fillStyle != null) {
+      context.fillStyle = actor.fillStyle;
+      context.fillRect(t_pos.x, t_pos.y, actor.width, actor.height);
+    }
+    if (actor.image != null) {
+      return context.drawImage(actor.image, t_pos.x, t_pos.y);
     }
   };
 
