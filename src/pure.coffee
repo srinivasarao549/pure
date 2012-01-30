@@ -4,6 +4,5 @@ _           = require './lib/underscore'
 # exports
 pure    = module.exports
 
-_.extend(pure, './actor')
-_.extend(pure, './render')
-_.extend(pure, './run')
+_.extend(pure, require './actor')
+_.extend(pure, require './run')

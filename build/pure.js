@@ -354,6 +354,119 @@ n.prototype.chain=function(){this._chain=true;return this};n.prototype.value=fun
 
 });
 
+require.define("/actor.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var Actor, Meta, add, create, pure, _;
+  var __slice = Array.prototype.slice;
+
+  _ = require('./lib/underscore');
+
+  pure = module.exports;
+
+  Actor = function() {
+    return {
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      alpha: 1,
+      color: null,
+      image: null,
+      touch: null,
+      drag: null,
+      keydown: null,
+      keyup: null,
+      keypress: null,
+      update: null,
+      _meta: Meta()
+    };
+  };
+
+  Meta = function() {
+    return {
+      children: [],
+      anim_q: [],
+      paused: false,
+      active: true
+    };
+  };
+
+  pure.create = create = function() {
+    var a, children, settings;
+    settings = arguments[0], children = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+    a = _.extend(Actor(), settings);
+    if (children != null) add(a, children);
+    return a;
+  };
+
+  pure.factory = function(o_settings) {
+    return function(n_settings) {
+      var a;
+      a = create.apply(null, arguments);
+      return _.extend(a, n_settings);
+    };
+  };
+
+  pure.add = add = function(parent, child) {
+    if (_.isArray(child)) {
+      return _.each(child, function(c) {
+        return add(parent, c);
+      });
+    }
+    parent._meta.children.push(child);
+    return parent;
+  };
+
+}).call(this);
+
+});
+
+require.define("/run.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var flywheel, pure, render, step, walk_apply, _;
+
+  _ = require('./lib/underscore');
+
+  flywheel = require('./lib/flywheel');
+
+  render = require('./private/render');
+
+  pure = module.exports;
+
+  pure.run = function(actor, canvas) {
+    var cb, ctx;
+    ctx = canvas.getContext('2d');
+    cb = function(timedelta) {
+      return step(actor, ctx, timedelta);
+    };
+    return flywheel(cb).start();
+  };
+
+  step = function(actor, context, timedelta) {
+    var cb;
+    cb = function(a) {
+      render.actor(a, context);
+      return typeof a.update === "function" ? a.update(timedelta) : void 0;
+    };
+    return walk_apply(actor, cb);
+  };
+
+  walk_apply = function(actor, func) {
+    var children;
+    func(actor);
+    children = actor._meta.children;
+    if (!_.isEmpty(children)) {
+      _.each(children, function(c) {
+        return walk_apply(c, func);
+      });
+    }
+    return actor;
+  };
+
+}).call(this);
+
+});
+
 require.define("/lib/flywheel.js", function (require, module, exports, __dirname, __filename) {
     void function(root){
     
@@ -460,161 +573,19 @@ require.define("/lib/flywheel.js", function (require, module, exports, __dirname
 
 });
 
-require.define("/world.coffee", function (require, module, exports, __dirname, __filename) {
+require.define("/private/render.coffee", function (require, module, exports, __dirname, __filename) {
     (function() {
-  var World_, World_Meta, funcs, pure, _;
+  var render, _;
 
-  _ = require('./lib/underscore');
+  _ = require('../lib/underscore');
 
-  pure = module.exports;
+  render = module.exports;
 
-  pure.World = function(settings) {
-    return _.extend(World_(), settings);
-  };
-
-  World_ = function() {
-    return {
-      levels: [],
-      names: {},
-      current: 0,
-      _meta: World_Meta(),
-      _funcs: funcs
-    };
-  };
-
-  World_Meta = function() {
-    return {
-      type: 'World'
-    };
-  };
-
-  funcs = {};
-
-  funcs.step = function(world, context, timedelta) {
-    var level;
-    level = world.levels[world.current];
-    return level._funcs.step(level, context, timedelta);
-  };
-
-  funcs.render = function(world, context) {
-    var level;
-    level = world.levels[world.current];
-    return level._funcs.render(level, context);
-  };
-
-  funcs.add = function(world, level) {
-    return world.levels.push(level);
-  };
-
-}).call(this);
-
-});
-
-require.define("/level.coffee", function (require, module, exports, __dirname, __filename) {
-    (function() {
-  var Level_, Level_Meta, funcs, pure, _;
-
-  _ = require('./lib/underscore');
-
-  pure = module.exports;
-
-  pure.Level = function(settings) {
-    return _.extend(Level_(), settings);
-  };
-
-  Level_ = function() {
-    return {
-      actors: [],
-      watchers: [],
-      curr_id: 0,
-      _meta: Level_Meta(),
-      _funcs: funcs
-    };
-  };
-
-  Level_Meta = function() {
-    return {
-      type: 'Level'
-    };
-  };
-
-  funcs = {};
-
-  funcs.step = function(level, context, timedelta) {
-    level.actors.sort(function(a, b) {
-      return a.z - b.z;
-    });
-    return _.each(level.actors, function(actor) {
-      return actor._funcs.step(actor, context, timedelta);
-    });
-  };
-
-  funcs.render = function(level, context) {
-    return _.each(level.actors, function(actor) {
-      return actor._funcs.render(actor, context);
-    });
-  };
-
-  funcs.add = function(level, actor) {
-    return level.actors.push(actor);
-  };
-
-}).call(this);
-
-});
-
-require.define("/actor.coffee", function (require, module, exports, __dirname, __filename) {
-    (function() {
-  var Actor_, Actor_Meta, funcs, pure, _;
-
-  _ = require('./lib/underscore');
-
-  pure = module.exports;
-
-  pure.Actor = function(settings) {
-    return _.extend(Actor_(), settings);
-  };
-
-  Actor_ = function() {
-    return {
-      x: 0,
-      y: 0,
-      z: 0,
-      width: 100,
-      height: 100,
-      alpha: 1,
-      color: '#000',
-      image: null,
-      touch: null,
-      drag: null,
-      keydown: null,
-      keyup: null,
-      keypress: null,
-      update: null,
-      _meta: Actor_Meta(),
-      _funcs: funcs
-    };
-  };
-
-  Actor_Meta = function() {
-    return {
-      type: 'Actor',
-      id: 0,
-      dead: false
-    };
-  };
-
-  funcs = {};
-
-  funcs.step = function(actor, context, timedelta) {
-    return typeof actor.update === "function" ? actor.update(timedelta) : void 0;
-  };
-
-  funcs.render = function(actor, context) {
-    if (actor.alpha) context.globalAlpha = actor.alpha;
+  render.actor = function(actor, context) {
+    context.globalAlpha = actor.alpha;
     if (actor.color != null) {
-      context.fillStyle = actor.color;
-      context.fillRect(actor.x, actor.y, actor.width, actor.height);
+      context.global;
+      context.strokeRect(actor.x, actor.y, actor.width, actor.height);
     }
     if (actor.image != null) {
       return context.drawImage(actor.image, actor.x, actor.y);
@@ -627,48 +598,15 @@ require.define("/actor.coffee", function (require, module, exports, __dirname, _
 
 require.define("/pure.coffee", function (require, module, exports, __dirname, __filename) {
     (function() {
-  var flywheel, pure, _;
+  var pure, _;
 
   _ = require('./lib/underscore');
 
-  flywheel = require('./lib/flywheel');
-
   pure = module.exports;
 
-  _.extend(pure, require('./world.coffee'));
+  _.extend(pure, require('./actor'));
 
-  _.extend(pure, require('./level.coffee'));
-
-  _.extend(pure, require('./actor.coffee'));
-
-  pure.factory = function(constructor, old_settings) {
-    return function(new_settings) {
-      var ret;
-      ret = _.extend(constructor(), old_settings);
-      return _.extend(ret, new_settings);
-    };
-  };
-
-  pure.run = function(pure_obj, canvas) {
-    var cb, context;
-    context = canvas.getContext('2d');
-    cb = function(time_delta) {
-      pure_obj._funcs.step(pure_obj, context, time_delta);
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      return pure_obj._funcs.render(pure_obj, context);
-    };
-    return flywheel(cb).start();
-  };
-
-  pure.add = function(a, b) {
-    if (_.isArray(b)) {
-      _.each(b, function(val, key) {
-        return pure.add(a, val);
-      });
-    } else {
-      return a._funcs.add(a, b);
-    }
-  };
+  _.extend(pure, require('./run'));
 
 }).call(this);
 

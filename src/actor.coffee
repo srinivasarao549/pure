@@ -11,7 +11,7 @@ Actor = ->
     width   : 100
     height  : 100
     alpha   : 1
-    color   : '#000'
+    color   : null
     image   : null
     touch   : null      # event handlers
     drag    : null
@@ -23,19 +23,22 @@ Actor = ->
 
 Meta = -> 
     children: []
+    anim_q  : []
     paused  : false
     active  : true
 
-# public
 
-# create :: object -> Actor
-pure.create = ( settings ) ->
-    _.extend(Actor(), settings)
+# create :: object, object... -> Actor
+pure.create = create = ( settings, children... ) ->
+    a = _.extend(Actor(), settings)
+    if children? 
+        add(a, children)
+    a
 
-# factory :: object -> ( object -> Actor )
+# factory :: object -> ( object, object... -> Actor )
 pure.factory = ( o_settings ) ->
     ( n_settings ) ->
-        a = _.extend(Actor(), o_settings)
+        a = create.apply(null, arguments)
         _.extend(a, n_settings)
 
 # add :: Actor, Actor || [Actor] -> Actor
@@ -43,3 +46,4 @@ pure.add = add = ( parent, child ) ->
     if _.isArray child 
         return _.each(child, (c) -> add(parent, c))
     parent._meta.children.push child
+    parent
