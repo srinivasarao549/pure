@@ -460,45 +460,6 @@ require.define("/lib/flywheel.js", function (require, module, exports, __dirname
 
 });
 
-require.define("/private/render.coffee", function (require, module, exports, __dirname, __filename) {
-    (function() {
-  var render, _;
-
-  _ = require('../lib/underscore');
-
-  render = module.exports;
-
-  render.clear = function(context) {
-    var c;
-    c = context.canvas;
-    return context.clearRect(0, 0, c.width, c.height);
-  };
-
-  render.actor = function(actor, context) {
-    var t_pos;
-    context.globalAlpha = actor.alpha;
-    t_pos = {
-      x: actor._meta.true_x,
-      y: actor._meta.true_y
-    };
-    if (actor.lineWidth != null) context.lineWidth = actor.lineWidth;
-    if (actor.strokeStyle != null) {
-      context.strokeStyle = actor.strokeStyle;
-      context.strokeRect(t_pos.x, t_pos.y, actor.width, actor.height);
-    }
-    if (actor.fillStyle != null) {
-      context.fillStyle = actor.fillStyle;
-      context.fillRect(t_pos.x, t_pos.y, actor.width, actor.height);
-    }
-    if (actor.image != null) {
-      return context.drawImage(actor.image, t_pos.x, t_pos.y);
-    }
-  };
-
-}).call(this);
-
-});
-
 require.define("/lib/bean.js", function (require, module, exports, __dirname, __filename) {
     /*!
   * bean.js - copyright Jacob Thornton 2011
@@ -905,62 +866,38 @@ require.define("/private/events.coffee", function (require, module, exports, __d
 
 });
 
-require.define("/run.coffee", function (require, module, exports, __dirname, __filename) {
+require.define("/private/render.coffee", function (require, module, exports, __dirname, __filename) {
     (function() {
-  var events, flywheel, pure, render, step, true_pos, walk_apply, _;
+  var render, _;
 
-  _ = require('./lib/underscore');
+  _ = require('../lib/underscore');
 
-  flywheel = require('./lib/flywheel');
+  render = module.exports;
 
-  render = require('./private/render');
-
-  events = require('./private/events');
-
-  pure = module.exports;
-
-  pure.run = function(actor, canvas) {
-    var cb, ctx, e_o;
-    ctx = canvas.getContext('2d');
-    e_o = events.bind(canvas);
-    cb = function(timedelta) {
-      return step(actor, ctx, timedelta, e_o);
-    };
-    return flywheel(cb).start();
+  render.clear = function(context) {
+    var c;
+    c = context.canvas;
+    return context.clearRect(0, 0, c.width, c.height);
   };
 
-  step = function(actor, context, timedelta, events_obj) {
-    var cb;
-    render.clear(context);
-    console.log(events_obj.mousedown.x, events_obj.mousedown.y);
-    cb = function(a) {
-      true_pos(a);
-      render.actor(a, context);
-      return typeof a.update === "function" ? a.update(timedelta) : void 0;
+  render.actor = function(actor, context) {
+    var t_pos;
+    context.globalAlpha = actor.alpha;
+    t_pos = {
+      x: actor._meta.true_x,
+      y: actor._meta.true_y
     };
-    return walk_apply(actor, cb);
-  };
-
-  walk_apply = function(actor, func) {
-    var children;
-    func(actor);
-    children = actor._meta.children;
-    if (!_.isEmpty(children)) {
-      _.each(children, function(c) {
-        return walk_apply(c, func);
-      });
+    if (actor.lineWidth != null) context.lineWidth = actor.lineWidth;
+    if (actor.strokeStyle != null) {
+      context.strokeStyle = actor.strokeStyle;
+      context.strokeRect(t_pos.x, t_pos.y, actor.width, actor.height);
     }
-    return actor;
-  };
-
-  true_pos = function(a) {
-    var p;
-    p = a._meta.parent;
-    a._meta.true_x = a.x;
-    a._meta.true_y = a.y;
-    if (p != null) {
-      a._meta.true_x += p._meta.true_x;
-      return a._meta.true_y += p._meta.true_y;
+    if (actor.fillStyle != null) {
+      context.fillStyle = actor.fillStyle;
+      context.fillRect(t_pos.x, t_pos.y, actor.width, actor.height);
+    }
+    if (actor.image != null) {
+      return context.drawImage(actor.image, t_pos.x, t_pos.y);
     }
   };
 
@@ -987,11 +924,7 @@ require.define("/actor.coffee", function (require, module, exports, __dirname, _
       strokeStyle: null,
       fillStyle: null,
       image: null,
-      touch: null,
-      drag: null,
-      keydown: null,
-      keyup: null,
-      keypress: null,
+      mousedown: null,
       update: null,
       _meta: Meta()
     };
@@ -1034,6 +967,68 @@ require.define("/actor.coffee", function (require, module, exports, __dirname, _
     parent._meta.children.push(child);
     child._meta.parent = parent;
     return parent;
+  };
+
+}).call(this);
+
+});
+
+require.define("/run.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var events_, flywheel, pure, render, step, true_pos, walk_apply, _;
+
+  _ = require('./lib/underscore');
+
+  flywheel = require('./lib/flywheel');
+
+  render = require('./private/render');
+
+  events_ = require('./private/events');
+
+  pure = module.exports;
+
+  pure.run = function(actor, canvas) {
+    var cb, ctx, events;
+    ctx = canvas.getContext('2d');
+    events = events_.bind(canvas);
+    cb = function(timedelta) {
+      return step(actor, events, ctx, timedelta);
+    };
+    return flywheel(cb).start();
+  };
+
+  step = function(actor, events, context, timedelta) {
+    var cb;
+    render.clear(context);
+    cb = function(a) {
+      true_pos(a);
+      if (typeof a.update === "function") a.update(timedelta);
+      return render.actor(a, context);
+    };
+    return walk_apply(actor, cb);
+  };
+
+  walk_apply = function(actor, func) {
+    var children;
+    func(actor);
+    children = actor._meta.children;
+    if (!_.isEmpty(children)) {
+      _.each(children, function(c) {
+        return walk_apply(c, func);
+      });
+    }
+    return actor;
+  };
+
+  true_pos = function(a) {
+    var p;
+    p = a._meta.parent;
+    a._meta.true_x = a.x;
+    a._meta.true_y = a.y;
+    if (p != null) {
+      a._meta.true_x += p._meta.true_x;
+      return a._meta.true_y += p._meta.true_y;
+    }
   };
 
 }).call(this);

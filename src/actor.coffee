@@ -14,11 +14,7 @@ Actor = ->
     strokeStyle : null
     fillStyle   : null
     image       : null
-    touch       : null      # event handlers
-    drag        : null
-    keydown     : null
-    keyup       : null
-    keypress    : null
+    mousedown   : null      # event handlers
     update      : null
     _meta       : Meta()
 

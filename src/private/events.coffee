@@ -7,27 +7,16 @@ events = module.exports
 
 # constructor
 Events = -> 
-    mousedown   : null
-    mouseup     : null
-    mousepressed: null
+    
+
 
 # bind :: canvas -> Events
 events.bind = ( canvas ) ->
-    events = Events()
-    bind_mouse(canvas, events)
 
-# bind_mouse :: canvas, Events -> Events
-bind_mouse = ( canvas, events ) ->
-    bean.add(canvas, 'mousedown', ( e ) -> events.mousedown = handle_mouse(canvas, e) )
-    bean.add(canvas, 'mouseup', ( e ) -> events.mouseup = handle_mouse(canvas, e) )
-    events
 
-handle_mouse = ( canvas, e ) -> 
-    coords = 
-            x: e.pageX ? e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft
-            y: e.pageY ? e.clientY + document.body.scrollTop + document.documentElement.scrollTop
-    relative_coords(canvas, coords.x, coords.y)
-
-relative_coords = ( canvas, x, y ) ->
-    x: x - canvas.offsetLeft
-    y: y - canvas.offsetTop
+coord_on_el = ( canvas, e ) ->
+    page_x  =  e.pageX ? e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft
+    page_y  = e.pageY ? e.clientY + document.body.scrollTop + document.documentElement.scrollTop
+    e.x     = page_x - canvas.offsetLeft
+    e.y     = page_y - canvas.offsetTop
+    e
