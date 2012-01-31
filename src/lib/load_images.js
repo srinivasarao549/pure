@@ -27,4 +27,4 @@ function load_images(image_object, callback){
 
 }
 
-module.exports = load_images
+if ( typeof module !== 'undefined' && module.exports ) module.exports = load_images

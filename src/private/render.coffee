@@ -10,12 +10,11 @@ render.clear = ( context ) ->
 
 # actor :: Actor, CanvasRenderingContext2D -> Actor
 render.actor = ( actor, context ) -> 
-    context.globalAlpha = actor.alpha
     t_pos = 
         x: actor._meta.true_x
         y: actor._meta.true_y
-    if actor.lineWidth?
-        context.lineWidth = actor.lineWidth
+    context.globalAlpha = actor.alpha
+    context.lineWidth = actor.lineWidth
     if actor.strokeStyle? 
         context.strokeStyle = actor.strokeStyle
         context.strokeRect(t_pos.x, t_pos.y, actor.width, actor.height)

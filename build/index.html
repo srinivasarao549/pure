@@ -6,8 +6,16 @@
     <canvas id="main" width="500" height="500"></canvas>
     
     <script src="pure.js"></script>
+    <script src="../src/lib/load_images.js"></script>
     <script>
         var pure    = require("./pure.coffee")
+          , images  = {}
+
+        load_images({
+            player: "images/player_left.png"
+        }, function(i){ 
+            images = i
+        })
 
     </script>
 </body>

@@ -11,6 +11,7 @@ Actor = ->
     width       : 100
     height      : 100
     alpha       : 1
+    lineWidth   : 1
     strokeStyle : null
     fillStyle   : null
     image       : null

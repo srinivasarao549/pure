@@ -11,18 +11,20 @@ pure = module.exports
 
 # run :: Actor, HTMLCanvas -> Flywheel
 pure.run = ( actor, canvas ) -> 
-    # setup 
     ctx     = canvas.getContext '2d'
     events  = events_.bind canvas
-    # callback for each step
-    cb      = ( timedelta ) ->
-        step(actor, events, ctx, timedelta)
-    flywheel(cb).start()
+    flywheel( ( timedelta ) -> 
+        step(actor, ctx, timedelta, events) 
+    ).start()
 
+
+
+# STEP ALL 
 # step :: Actor, Events, CanvasRenderingContext2d, number -> Actor
-step = ( actor, events, context, timedelta) ->
+step = ( actor, context, timedelta, events) ->
+    events = events()
     render.clear context
-    walk_apply(actor, ( a ) -> step_actor(a, context, timedelta))
+    walk_apply(actor, ( a ) -> step_actor(a, context, timedelta, events))
 
 
 # walk :: Actor, function -> Actor 
@@ -33,13 +35,15 @@ walk_apply = ( actor, func ) ->
         _.each(children, ( c ) -> walk_apply(c, func))
     actor
 
+
+# SINGLE ACTOR STEPS
 # step_actor :: Actor, CanvasRenderingContext2d, number -> Actor
-step_actor = ( actor, context, timedelta ) ->
-    update_abs_coords a                  
-    a.update?(timedelta) 
+step_actor = ( a, context, timedelta, events ) ->
+    update_abs_coords a
+    a.update? timedelta 
     render.actor(a, context) 
 
-# true_pos :: Actor -> Actor
+#  update_abs_coords :: Actor -> Actor
 update_abs_coords = ( a ) ->
     p = a._meta.parent
     a._meta.true_x = a.x

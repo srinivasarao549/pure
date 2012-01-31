@@ -354,6 +354,75 @@ n.prototype.chain=function(){this._chain=true;return this};n.prototype.value=fun
 
 });
 
+require.define("/actor.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var Actor, Meta, add, create, pure, _;
+  var __slice = Array.prototype.slice;
+
+  _ = require('./lib/underscore');
+
+  pure = module.exports;
+
+  Actor = function() {
+    return {
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      alpha: 1,
+      lineWidth: 1,
+      strokeStyle: null,
+      fillStyle: null,
+      image: null,
+      mousedown: null,
+      update: null,
+      _meta: Meta()
+    };
+  };
+
+  Meta = function() {
+    return {
+      parent: null,
+      children: [],
+      anim_q: [],
+      paused: false,
+      active: true,
+      true_x: 0,
+      true_y: 0
+    };
+  };
+
+  pure.create = create = function() {
+    var a, children, settings;
+    settings = arguments[0], children = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+    a = _.extend(Actor(), settings);
+    if (children != null) add(a, children);
+    return a;
+  };
+
+  pure.factory = function(o_settings) {
+    return function(n_settings) {
+      var a;
+      a = create.apply(null, arguments);
+      return _.extend(a, n_settings);
+    };
+  };
+
+  pure.add = add = function(parent, child) {
+    if (_.isArray(child)) {
+      return _.each(child, function(c) {
+        return add(parent, c);
+      });
+    }
+    parent._meta.children.push(child);
+    child._meta.parent = parent;
+    return parent;
+  };
+
+}).call(this);
+
+});
+
 require.define("/lib/flywheel.js", function (require, module, exports, __dirname, __filename) {
     void function(root){
     
@@ -457,6 +526,98 @@ require.define("/lib/flywheel.js", function (require, module, exports, __dirname
         root["flywheel"] = flywheel
 
 }(this)
+
+});
+
+require.define("/private/render.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var render, _;
+
+  _ = require('../lib/underscore');
+
+  render = module.exports;
+
+  render.clear = function(context) {
+    var c;
+    c = context.canvas;
+    return context.clearRect(0, 0, c.width, c.height);
+  };
+
+  render.actor = function(actor, context) {
+    var t_pos;
+    t_pos = {
+      x: actor._meta.true_x,
+      y: actor._meta.true_y
+    };
+    context.globalAlpha = actor.alpha;
+    context.lineWidth = actor.lineWidth;
+    if (actor.strokeStyle != null) {
+      context.strokeStyle = actor.strokeStyle;
+      context.strokeRect(t_pos.x, t_pos.y, actor.width, actor.height);
+    }
+    if (actor.fillStyle != null) {
+      context.fillStyle = actor.fillStyle;
+      context.fillRect(t_pos.x, t_pos.y, actor.width, actor.height);
+    }
+    if (actor.image != null) {
+      return context.drawImage(actor.image, t_pos.x, t_pos.y);
+    }
+  };
+
+}).call(this);
+
+});
+
+require.define("/private/events.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var Events, bean, coord_on_el, events, _;
+
+  _ = require('../lib/underscore');
+
+  bean = require('../lib/bean');
+
+  events = module.exports;
+
+  Events = function() {
+    return {
+      touchstart: null,
+      touchend: null,
+      touchmove: null,
+      touchcancel: null,
+      touchleave: null
+    };
+  };
+
+  events.bind = function(canvas) {
+    var ev;
+    ev = Events();
+    bean.add(canvas, 'touchstart mousedown', function(e) {
+      return ev.touchstart = coord_on_el(canvas, e);
+    });
+    bean.add(canvas, 'touchmove', function(e) {
+      return ev.touchmove = coord_on_el(canvas, e);
+    });
+    bean.add(canvas, 'touchend mouseup', function(e) {
+      return ev.touchen = coord_on_el(canvas, e);
+    });
+    return function() {
+      var e;
+      e = ev;
+      ev = Events();
+      return e;
+    };
+  };
+
+  coord_on_el = function(canvas, e) {
+    var page_x, page_y, _ref, _ref2;
+    page_x = (_ref = e.pageX) != null ? _ref : e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+    page_y = (_ref2 = e.pageY) != null ? _ref2 : e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+    e.x = page_x - canvas.offsetLeft;
+    e.y = page_y - canvas.offsetTop;
+    return e;
+  };
+
+}).call(this);
 
 });
 
@@ -813,169 +974,9 @@ require.define("/lib/bean.js", function (require, module, exports, __dirname, __
 
 });
 
-require.define("/private/events.coffee", function (require, module, exports, __dirname, __filename) {
-    (function() {
-  var Events, bean, bind_mouse, events, handle_mouse, relative_coords, _;
-
-  _ = require('../lib/underscore');
-
-  bean = require('../lib/bean');
-
-  events = module.exports;
-
-  Events = function() {
-    return {
-      mousedown: null,
-      mouseup: null,
-      mousepressed: null
-    };
-  };
-
-  events.bind = function(canvas) {
-    events = Events();
-    return bind_mouse(canvas, events);
-  };
-
-  bind_mouse = function(canvas, events) {
-    bean.add(canvas, 'mousedown', function(e) {
-      return events.mousedown = handle_mouse(canvas, e);
-    });
-    bean.add(canvas, 'mouseup', function(e) {
-      return events.mouseup = handle_mouse(canvas, e);
-    });
-    return events;
-  };
-
-  handle_mouse = function(canvas, e) {
-    var coords, _ref, _ref2;
-    coords = {
-      x: (_ref = e.pageX) != null ? _ref : e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft,
-      y: (_ref2 = e.pageY) != null ? _ref2 : e.clientY + document.body.scrollTop + document.documentElement.scrollTop
-    };
-    return relative_coords(canvas, coords.x, coords.y);
-  };
-
-  relative_coords = function(canvas, x, y) {
-    return {
-      x: x - canvas.offsetLeft,
-      y: y - canvas.offsetTop
-    };
-  };
-
-}).call(this);
-
-});
-
-require.define("/private/render.coffee", function (require, module, exports, __dirname, __filename) {
-    (function() {
-  var render, _;
-
-  _ = require('../lib/underscore');
-
-  render = module.exports;
-
-  render.clear = function(context) {
-    var c;
-    c = context.canvas;
-    return context.clearRect(0, 0, c.width, c.height);
-  };
-
-  render.actor = function(actor, context) {
-    var t_pos;
-    context.globalAlpha = actor.alpha;
-    t_pos = {
-      x: actor._meta.true_x,
-      y: actor._meta.true_y
-    };
-    if (actor.lineWidth != null) context.lineWidth = actor.lineWidth;
-    if (actor.strokeStyle != null) {
-      context.strokeStyle = actor.strokeStyle;
-      context.strokeRect(t_pos.x, t_pos.y, actor.width, actor.height);
-    }
-    if (actor.fillStyle != null) {
-      context.fillStyle = actor.fillStyle;
-      context.fillRect(t_pos.x, t_pos.y, actor.width, actor.height);
-    }
-    if (actor.image != null) {
-      return context.drawImage(actor.image, t_pos.x, t_pos.y);
-    }
-  };
-
-}).call(this);
-
-});
-
-require.define("/actor.coffee", function (require, module, exports, __dirname, __filename) {
-    (function() {
-  var Actor, Meta, add, create, pure, _;
-  var __slice = Array.prototype.slice;
-
-  _ = require('./lib/underscore');
-
-  pure = module.exports;
-
-  Actor = function() {
-    return {
-      x: 0,
-      y: 0,
-      width: 100,
-      height: 100,
-      alpha: 1,
-      strokeStyle: null,
-      fillStyle: null,
-      image: null,
-      mousedown: null,
-      update: null,
-      _meta: Meta()
-    };
-  };
-
-  Meta = function() {
-    return {
-      parent: null,
-      children: [],
-      anim_q: [],
-      paused: false,
-      active: true,
-      true_x: 0,
-      true_y: 0
-    };
-  };
-
-  pure.create = create = function() {
-    var a, children, settings;
-    settings = arguments[0], children = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    a = _.extend(Actor(), settings);
-    if (children != null) add(a, children);
-    return a;
-  };
-
-  pure.factory = function(o_settings) {
-    return function(n_settings) {
-      var a;
-      a = create.apply(null, arguments);
-      return _.extend(a, n_settings);
-    };
-  };
-
-  pure.add = add = function(parent, child) {
-    if (_.isArray(child)) {
-      return _.each(child, function(c) {
-        return add(parent, c);
-      });
-    }
-    parent._meta.children.push(child);
-    child._meta.parent = parent;
-    return parent;
-  };
-
-}).call(this);
-
-});
-
 require.define("/run.coffee", function (require, module, exports, __dirname, __filename) {
     (function() {
-  var events_, flywheel, pure, render, step, true_pos, walk_apply, _;
+  var events_, flywheel, pure, render, step, step_actor, update_abs_coords, walk_apply, _;
 
   _ = require('./lib/underscore');
 
@@ -988,24 +989,20 @@ require.define("/run.coffee", function (require, module, exports, __dirname, __f
   pure = module.exports;
 
   pure.run = function(actor, canvas) {
-    var cb, ctx, events;
+    var ctx, events;
     ctx = canvas.getContext('2d');
     events = events_.bind(canvas);
-    cb = function(timedelta) {
-      return step(actor, events, ctx, timedelta);
-    };
-    return flywheel(cb).start();
+    return flywheel(function(timedelta) {
+      return step(actor, ctx, timedelta, events);
+    }).start();
   };
 
-  step = function(actor, events, context, timedelta) {
-    var cb;
+  step = function(actor, context, timedelta, events) {
+    events = events();
     render.clear(context);
-    cb = function(a) {
-      true_pos(a);
-      if (typeof a.update === "function") a.update(timedelta);
-      return render.actor(a, context);
-    };
-    return walk_apply(actor, cb);
+    return walk_apply(actor, function(a) {
+      return step_actor(a, context, timedelta, events);
+    });
   };
 
   walk_apply = function(actor, func) {
@@ -1020,7 +1017,13 @@ require.define("/run.coffee", function (require, module, exports, __dirname, __f
     return actor;
   };
 
-  true_pos = function(a) {
+  step_actor = function(a, context, timedelta, events) {
+    update_abs_coords(a);
+    if (typeof a.update === "function") a.update(timedelta);
+    return render.actor(a, context);
+  };
+
+  update_abs_coords = function(a) {
     var p;
     p = a._meta.parent;
     a._meta.true_x = a.x;
