@@ -1,8 +1,10 @@
 # imports
 _       = require './lib/underscore'
+util    = require './lib/util'
 
 # exports
 pure    = module.exports
+
 
 # constructors
 Actor = ->
@@ -15,9 +17,10 @@ Actor = ->
     strokeStyle : null
     fillStyle   : null
     image       : null
+    sprite      : null
     mousedown   : null      # event handlers
     update      : null
-    _meta       : Meta()
+    _meta       : Meta()    # internal data
 
 Meta = -> 
     parent  : null
@@ -28,23 +31,23 @@ Meta = ->
     true_x  : 0
     true_y  : 0
 
-# create :: object, object... -> Actor
-pure.create = create = ( settings, children... ) ->
-    a = _.extend(Actor(), settings)
-    if children? 
-        add(a, children)
-    a
 
-# factory :: object -> ( object, object... -> Actor )
-pure.factory = ( o_settings ) ->
-    ( n_settings ) ->
-        a = create.apply(null, arguments)
+# create :: object, Actor || [Actor] -> Actor
+pure.create = create = ( settings, children ) ->
+    a = _.extend(Actor(), settings)
+    if children? then add(a, children)
+
+# factory :: object -> ( object, Actor || [Actor] -> Actor )
+pure.factory = ( o_settings ) -> 
+    ( n_settings, children ) -> 
+        a = create(o_settings, children)
         _.extend(a, n_settings)
 
 # add :: Actor, Actor || [Actor] -> Actor
-pure.add = add = ( parent, child ) ->
-    if _.isArray child 
-        return _.each(child, (c) -> add(parent, c))
-    parent._meta.children.push child
-    child._meta.parent = parent
+pure.add = add = ( parent, children ) ->
+    children = util.arr_lift(children)
+    _.each(children, (child) -> 
+        parent._meta.children.push child
+        child._meta.parent = parent
+    )
     parent
