@@ -36,6 +36,7 @@ Meta = ->
 pure.create = create = ( settings, children ) ->
     a = _.extend(Actor(), settings)
     if children? then add(a, children)
+    a
 
 # factory :: object -> ( object, Actor || [Actor] -> Actor )
 pure.factory = ( o_settings ) -> 

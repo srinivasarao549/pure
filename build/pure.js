@@ -354,69 +354,20 @@ n.prototype.chain=function(){this._chain=true;return this};n.prototype.value=fun
 
 });
 
-require.define("/actor.coffee", function (require, module, exports, __dirname, __filename) {
+require.define("/lib/util.coffee", function (require, module, exports, __dirname, __filename) {
     (function() {
-  var Actor, Meta, add, create, pure, _;
-  var __slice = Array.prototype.slice;
+  var util, _;
 
-  _ = require('./lib/underscore');
+  _ = require('./underscore');
 
-  pure = module.exports;
+  util = module.exports;
 
-  Actor = function() {
-    return {
-      x: 0,
-      y: 0,
-      width: 100,
-      height: 100,
-      alpha: 1,
-      lineWidth: 1,
-      strokeStyle: null,
-      fillStyle: null,
-      image: null,
-      mousedown: null,
-      update: null,
-      _meta: Meta()
-    };
-  };
-
-  Meta = function() {
-    return {
-      parent: null,
-      children: [],
-      anim_q: [],
-      paused: false,
-      active: true,
-      true_x: 0,
-      true_y: 0
-    };
-  };
-
-  pure.create = create = function() {
-    var a, children, settings;
-    settings = arguments[0], children = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    a = _.extend(Actor(), settings);
-    if (children != null) add(a, children);
-    return a;
-  };
-
-  pure.factory = function(o_settings) {
-    return function(n_settings) {
-      var a;
-      a = create.apply(null, arguments);
-      return _.extend(a, n_settings);
-    };
-  };
-
-  pure.add = add = function(parent, child) {
-    if (_.isArray(child)) {
-      return _.each(child, function(c) {
-        return add(parent, c);
-      });
+  util.arr_lift = function(arr) {
+    if (_.isArray(arr)) {
+      return arr;
+    } else {
+      return [arr];
     }
-    parent._meta.children.push(child);
-    child._meta.parent = parent;
-    return parent;
   };
 
 }).call(this);
@@ -971,6 +922,74 @@ require.define("/lib/bean.js", function (require, module, exports, __dirname, __
 
   return bean;
 });
+
+});
+
+require.define("/actor.coffee", function (require, module, exports, __dirname, __filename) {
+    (function() {
+  var Actor, Meta, add, create, pure, util, _;
+
+  _ = require('./lib/underscore');
+
+  util = require('./lib/util');
+
+  pure = module.exports;
+
+  Actor = function() {
+    return {
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      alpha: 1,
+      lineWidth: 1,
+      strokeStyle: null,
+      fillStyle: null,
+      image: null,
+      sprite: null,
+      mousedown: null,
+      update: null,
+      _meta: Meta()
+    };
+  };
+
+  Meta = function() {
+    return {
+      parent: null,
+      children: [],
+      anim_q: [],
+      paused: false,
+      active: true,
+      true_x: 0,
+      true_y: 0
+    };
+  };
+
+  pure.create = create = function(settings, children) {
+    var a;
+    a = _.extend(Actor(), settings);
+    if (children != null) add(a, children);
+    return a;
+  };
+
+  pure.factory = function(o_settings) {
+    return function(n_settings, children) {
+      var a;
+      a = create(o_settings, children);
+      return _.extend(a, n_settings);
+    };
+  };
+
+  pure.add = add = function(parent, children) {
+    children = util.arr_lift(children);
+    _.each(children, function(child) {
+      parent._meta.children.push(child);
+      return child._meta.parent = parent;
+    });
+    return parent;
+  };
+
+}).call(this);
 
 });
 
